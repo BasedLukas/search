@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve your Flask app
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+
+WorkingDirectory=/path/to/project
+Environment="PATH=/path/to/project"
+ExecStart=/path/to/project --workers 3 --bind 127.0.0.1:5000 application:app
+
+[Install]
+WantedBy=multi-user.target

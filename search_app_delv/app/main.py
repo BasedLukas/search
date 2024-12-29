@@ -1,13 +1,15 @@
+import logging
 from flask import Flask, request, render_template
 from backend.main import search
 
 
+logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 
 @app.route('/')
 def search_page():
-    return render_template('index.html')  # The search page
+    return render_template('index.html') 
 
 @app.route('/search')
 def results_page():

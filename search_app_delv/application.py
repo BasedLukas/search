@@ -1,6 +1,6 @@
 from app.main import app
 
-application = app
+
 
 if __name__ == "__main__":
-    application.run()
+    app.run( port=5000)
