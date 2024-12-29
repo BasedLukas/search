@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+</head>
+<body>
+    <div class="search-bar">
+        <form action="/search" method="get">
+            <input type="text" name="query" placeholder="Search again..." value="{{ query }}" autofocus>
+            <input type="submit" value="Search">
+        </form>
+    </div>
+    <div class="results-container">
+        <h1>Search Results for "{{ query }}"</h1>
+        <div class="results-grid">
+            <!-- Engine 1 results -->
+            <div class="engine-results" id="engine1">
+                <h2>Engine 1</h2>
+                <ul>
+                    {% for result in engine1_results %}
+                        <li>
+                            <a href="{{ result.url }}">{{ result.title }}</a>
+                            <p>{{ result.snippet }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- Engine 2 results -->
+            <div class="engine-results" id="engine2">
+                <h2>Engine 2</h2>
+                <ul>
+                    {% for result in engine2_results %}
+                        <li>
+                            <a href="{{ result.url }}">{{ result.title }}</a>
+                            <p>{{ result.snippet }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <a href="/">Back to Search</a>
+    </div>
+</body>
+</html>
+

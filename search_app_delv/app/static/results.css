@@ -1,0 +1,142 @@
+
+/* Layout container to ensure structured stacking */
+body > * {
+    display: block;
+}
+
+/* Search Bar */
+.search-bar {
+    position: sticky; /* Keeps it at the top when scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f4f4f9;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 15px;
+    z-index: 1000; /* Ensure it stays above other elements */
+}
+
+.search-bar form {
+    display: flex;
+    flex-direction: row; /* Input and button side by side */
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    max-width: 800px; /* Constrain width */
+    margin: 0 auto; /* Center the form */
+}
+
+.search-bar input[type="text"] {
+    flex: 1;
+    padding: 6px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    outline: none;
+}
+
+.search-bar input[type="text"]:focus {
+    border-color: #007BFF;
+    background-color: #f9f9f9;
+}
+
+.search-bar input[type="submit"] {
+    padding: 6px 12px;
+    font-size: 14px;
+    color: white;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.search-bar input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Results Container */
+.results-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr; /* Single column by default */
+    gap: 20px; /* Space between items */
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Results Grid for Desktop */
+@media (min-width: 601px) {
+    .results-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Two columns for engines */
+        gap: 20px;
+    }
+}
+
+/* Results Grid for Mobile */
+@media (max-width: 600px) {
+    .results-grid {
+        display: grid;
+        grid-template-columns: 1fr; /* Single column for small screens */
+        gap: 15px;
+    }
+}
+
+/* Engine Results */
+.engine-results {
+    background: white;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.engine-results h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.engine-results ul {
+    list-style: none;
+    padding: 0;
+}
+
+.engine-results li {
+    margin-bottom: 15px;
+}
+
+.engine-results a {
+    font-size: 16px;
+    font-weight: bold;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.engine-results a:hover {
+    text-decoration: underline;
+}
+
+.engine-results p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Back to Search Link */
+.results-container a {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.results-container a:hover {
+    text-decoration: underline;
+}
