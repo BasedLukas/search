@@ -11,6 +11,10 @@ rsync -avz \
     --exclude='venv' \
     --exclude='__pycache__' \
     --exclude='.git' \
+    --include='data/' \
+    --include='data/__init__.py' \
+    --include='data/search.py' \
+    --exclude='data/*' \
     $SOURCE_DIR $DESTINATION
 
 # SSH into the server, navigate to the application directory, and restart the app service

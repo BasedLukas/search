@@ -45,3 +45,9 @@ pandas
 pyarrow
 fsspec 
 s3fs
+torch
+tensorboard
+sentence-transformers>=3
+datasets
+transformers
+faiss-cpu

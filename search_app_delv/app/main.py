@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def search_page():
-    return render_template('index.html') 
+    return render_template('index.html', n=1266697) 
 
 @app.route('/search')
 def results_page():

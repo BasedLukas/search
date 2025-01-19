@@ -6,11 +6,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <title>Search Engine</title>
-
 </head>
 <body>
     <div class="search-box">
         <h1>Search Engine</h1>
+        <p style="color: red; font-weight: bold;">This is not a product demo!</p>
+        <p>
+            This search engine is a technical proof of concept. It shows the feasibility of the technology, and our ability to build it.
+        </p>
+        <p>
+            Currently, {{n}} random internet pages have been indexed. The ranking algorithm still requires tuning.
+            Many pages will not be discoverable, as we haven't indexed them yet. 
+            This is a demonstration that building a search engine of this size, using a NN-first approach, will work.
+        </p>
         <form action="/search" method="get">
             <input type="text" name="query" placeholder="Enter your search..." autofocus required>
             <input type="submit" value="Search">
