@@ -2,6 +2,7 @@ import os
 import gzip
 import dotenv
 import json
+import numpy as np
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import login
 from typing import List, Tuple, Set
@@ -113,12 +114,68 @@ def process_directory(
             mf.write(file_name + "\n")
         processed_files.add(file_name)
 
+
+def normalize_embeddings(input_file: str, output_file: str):
+    embeddings = []
+    urls = []
+
+    # Read and parse all embeddings from the input file
+    with open(input_file, "r", encoding="utf-8") as f:
+        for line in f:
+            data = json.loads(line.strip())
+            urls.append(data["url"])
+            embeddings.append(data["embedding"])
+
+    arr = np.array(embeddings, dtype=np.float32)  # shape: (num_samples, dims)
+
+    # Compute summary statistics
+    mean = arr.mean(axis=0)  # dimension-wise mean
+    min_ = arr.min(axis=0)
+    max_ = arr.max(axis=0)
+    range_ = np.where(max_ == min_, 1, max_ - min_)  # Avoid division by zero
+
+    # Normalize dimension-wise
+    arr = (arr - mean) / range_
+
+    # Scale to 0-255 and convert to uint8
+    global_min = arr.min()
+    global_max = arr.max()
+    arr = (arr - global_min) / (global_max - global_min) * 255
+    arr = arr.astype(np.uint8)
+
+    # Write summary statistics and normalized embeddings to the output file
+    statistics = {
+        "mean": mean.tolist(),
+        "min": min_.tolist(),
+        "max": max_.tolist(),
+        "global_min": global_min,
+        "global_max": global_max
+    }
+
+    with open(output_file, "w", encoding="utf-8") as wf:
+        # Write the summary statistics as the first line
+        json.dump({"statistics": statistics}, wf, ensure_ascii=False)
+        wf.write("\n")
+
+        # Write the normalized embeddings
+        for url, embedding in zip(urls, arr):
+            data_out = {"url": url, "embedding": embedding.tolist()}
+            json.dump(data_out, wf, ensure_ascii=False)
+            wf.write("\n")
+
+    # Print summary information
+    print("Normalization complete.")
+    print(f"Number of vectors processed: {len(embeddings)}")
+    print(f"Number of dimensions per vector: {arr.shape[1]}")
+    print("Summary statistics written to the output file.")
+
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Process WET files and embed content with restart capability.")
-    parser.add_argument("--input_dir", type=str, required=True, help="Directory containing WET files.")
-    parser.add_argument("--output_file", type=str, required=True, help="Permanent JSON lines file.")
+    parser.add_argument("--input_dir", type=str, default="downloaded_wets", help="Directory containing WET files.")
+    parser.add_argument("--output_file", type=str, default="out.json", help="Permanent JSON lines file.")
     parser.add_argument("--working_file", type=str, default="temp.json", help="Working JSON lines file.")
     parser.add_argument("--metadata_file", type=str, default="processing_metadata", help="File listing processed WET files.")
     parser.add_argument("--device", type=str, default="cuda", help="Device to run the model on (e.g., 'cpu', 'cuda').")
@@ -129,13 +186,18 @@ if __name__ == "__main__":
     args = parser.parse_args()
     load_environment()
 
-    process_directory(
-        input_dir=args.input_dir,
-        permanent_file=args.output_file,
-        working_file=args.working_file,
-        metadata_file=args.metadata_file,
-        device=args.device,
-        batch_size=args.batch_size,
-        embedding_dim=args.embedding_dim,
-        precision=args.precision
+    # process_directory(
+    #     input_dir=args.input_dir,
+    #     permanent_file=args.output_file,
+    #     working_file=args.working_file,
+    #     metadata_file=args.metadata_file,
+    #     device=args.device,
+    #     batch_size=args.batch_size,
+    #     embedding_dim=args.embedding_dim,
+    #     precision=args.precision
+    # )
+
+    normalize_embeddings(
+        input_file=args.output_file,
+        output_file="../backend/embeddings.json"
     )

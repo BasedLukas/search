@@ -3,3 +3,5 @@
 *.csv
 data/downloaded_*
 data/*.json
+backend/index.bin
+backend/url_mapping.json
