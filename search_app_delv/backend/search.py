@@ -12,6 +12,7 @@ import json
 import faiss
 import boto3
 import io
+import dotenv
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from typing import List, Tuple, Dict
@@ -20,28 +21,30 @@ from bs4 import BeautifulSoup
 from backend.logs import logger as log
 
 # ---------------- CONFIGURATION ----------------
-# S3 bucket where index and URL mapping are stored
-S3_BUCKET = "example-resource"
+env = dotenv.dotenv_values()
+DEV = env.get("DEV") == "True"
 
-# File paths for FAISS index and URL mapping (use "s3://example-bucket/key" for S3)
-INDEX_FILE = f"s3://{S3_BUCKET}/index.bin"
-URL_MAPPING_FILE = f"s3://{S3_BUCKET}/url_mapping.json"
+if DEV:
+    log.warning("ON DEV MODE")
+    HTML_BASE_PREFIX = None
+    INDEX_FILE = "backend/index.bin"
+    URL_MAPPING_FILE = "backend/url_mapping.json"
+    HTML_BASE_PATH = "/path/to/project"
+else:
+    log.warning("ON PROD MODE")
+    HTML_BASE_PREFIX = "docs/"  # Folder inside the bucket where HTML files are stored
+    S3_BUCKET = "example-resource"
+    INDEX_FILE = f"s3://{S3_BUCKET}/index.bin"
+    URL_MAPPING_FILE = f"s3://{S3_BUCKET}/url_mapping.json"
+    HTML_BASE_PATH = "/path/to/project"
 
-# Directory for HTML files (from S3 bucket)
-HTML_BASE_PREFIX = "docs/"  # Folder inside the bucket where HTML files are stored
 
 # SentenceTransformer model settings
 MODEL_ID = "BAAI/bge-base-en-v1.5"  # Model for text embeddings
 DEVICE = "cpu"  # Change to 'cuda' if running on GPU
-
 # FAISS index settings
 FAISS_VECTOR_DIM = 768  # Dimensionality of the embeddings
 TOP_K_RESULTS = 10  # Number of top results to return
-
-# Debugging / Local settings (comment out if using S3 fully)
-# INDEX_FILE = "backend/index.bin"
-# URL_MAPPING_FILE = "backend/url_mapping.json"
-HTML_BASE_PATH = "/path/to/project"
 # ----------------------------------------------
 
 
@@ -51,6 +54,7 @@ class Result:
     url: str
     snippet: str
     text: str
+    html:str
     distance: float
 
 @dataclass
@@ -156,7 +160,7 @@ def create_search_engine() -> Tuple[callable, Stats]:
                 file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{file_path}"
                 
 
-            snippet = get_html_text(file_path)
+            fulltext = get_html_text(file_path)
 
             # Extract title
             title = file_path  # Default to file path
@@ -169,17 +173,15 @@ def create_search_engine() -> Tuple[callable, Stats]:
                 else:
                     with open(file_path, "r", encoding="utf-8") as f:
                         html_content = f.read()
-                soup = BeautifulSoup(html_content, "html.parser")
-                if soup.title and soup.title.get_text():
-                    title = soup.title.get_text(strip=True)
             except Exception as e:
                 print(f"Failed to extract title from {file_path}: {e}")
 
             results.append(Result(
                 title=title,
                 url=file_path,
-                snippet=snippet,
-                text=snippet,
+                snippet=fulltext,
+                text=fulltext[:250],
+                html=html_content,
                 distance=float(distances[0][i])
             ))
 

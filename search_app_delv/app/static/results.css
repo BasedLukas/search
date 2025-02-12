@@ -140,3 +140,33 @@ h1 {
 .results-container a:hover {
     text-decoration: underline;
 }
+
+/* New styles for each search result */
+.result-item {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.result-text {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.view-html-link {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.view-html-link:hover {
+    text-decoration: underline;
+}
+
+.result-distance {
+    font-size: 14px;
+    color: #555;
+}

@@ -1,23 +1,13 @@
-/* Styles specific to the search page */
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-}
-
+* Styles specific to the search page */
 .search-box {
-    width: 90%; /* Allow responsiveness */
-    max-width: 600px; /* Restrict to a maximum width */
+    width: 90%;
+    max-width: 600px;
     margin: 0 auto;
-    text-align: left; /* Align text to the left */
+    text-align: left;
 }
 
 .search-box h1 {
-    text-align: center; /* Keep the title centered */
+    text-align: center;
 }
 
 .search-box p {
@@ -25,10 +15,27 @@ body {
     line-height: 1.6;
 }
 
+/* Reduced line spacing for the description paragraph */
+.description {
+    line-height: 1.4;
+}
+
+/* Make warning text red */
+.warning {
+    color: red;
+}
+
+/* List for dash items */
+.info-list {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+/* Search form styling */
 .search-box form {
     margin-top: 20px;
     display: flex;
-    justify-content: center; /* Center the search box horizontally */
+    justify-content: center;
     gap: 10px;
 }
 
@@ -59,23 +66,44 @@ input[type="submit"]:hover {
     background-color: #0056b3;
 }
 
+/* Preset search buttons */
+.default-queries h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.button-group button {
+    padding: 10px 15px;
+    font-size: 14px;
+    color: white;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-group button:hover {
+    background-color: #0056b3;
+}
+
 /* Mobile styles */
 @media (max-width: 600px) {
-    .search-box {
-        text-align: center; /* Center-align text for small screens */
-    }
-
+    
     .search-box form {
-        flex-direction: column; /* Stack input and button vertically */
-        align-items: stretch; /* Make items take full width */
+        flex-direction: column;
+        align-items: stretch;
         gap: 15px;
     }
-
-    input[type="text"] {
-        width: 100%; /* Ensure input spans full width */
-    }
-
+    
+    input[type="text"],
     input[type="submit"] {
-        width: 100%; /* Ensure button spans full width */
+        width: 100%;
     }
 }
