@@ -1,7 +1,8 @@
 .env
+venv
 **/__pycache__/** 
 *.csv
 data/downloaded_*
 data/*.json
-backend/index.bin
-backend/url_mapping.json
+backend/*.bin
+backend/*.json

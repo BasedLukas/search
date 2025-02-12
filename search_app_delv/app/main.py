@@ -2,15 +2,17 @@ import logging
 import json
 from flask import Flask, request, render_template
 from backend.main import search
+from backend.logs import logger as log
+import sys
 
-logging.basicConfig(level=logging.DEBUG)
+log.info("App init")
 app = Flask(__name__)
 
 
 
 @app.route('/')
 def search_page():
-    return render_template('index.html')
+    return render_template('index.html', n=0)
 
 @app.route('/search')
 def results_page():

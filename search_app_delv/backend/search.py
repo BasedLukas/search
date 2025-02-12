@@ -1,87 +1,205 @@
+#!/usr/bin/env python3
+"""
+Search engine that loads a FAISS index, a URL mapping, and a SentenceTransformer model.
+Search encodes queries, performs a nearest-neighbor lookup, retrieves corresponding HTML (from S3 or local),
+extracts text (for the snippet), and attempts to extract the title.
+
+Each result is returned as a `Result` object with title, URL, snippet, text, and distance.
+"""
+
+import time
 import json
 import faiss
+import boto3
+import io
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from typing import List, Tuple
+from typing import List, Tuple, Dict
+from dataclasses import dataclass
+from bs4 import BeautifulSoup
+from backend.logs import logger as log
+
+# ---------------- CONFIGURATION ----------------
+# S3 bucket where index and URL mapping are stored
+S3_BUCKET = "example-resource"
+
+# File paths for FAISS index and URL mapping (use "s3://example-bucket/key" for S3)
+INDEX_FILE = f"s3://{S3_BUCKET}/index.bin"
+URL_MAPPING_FILE = f"s3://{S3_BUCKET}/url_mapping.json"
+
+# Directory for HTML files (from S3 bucket)
+HTML_BASE_PREFIX = "docs/"  # Folder inside the bucket where HTML files are stored
+
+# SentenceTransformer model settings
+MODEL_ID = "BAAI/bge-base-en-v1.5"  # Model for text embeddings
+DEVICE = "cpu"  # Change to 'cuda' if running on GPU
+
+# FAISS index settings
+FAISS_VECTOR_DIM = 768  # Dimensionality of the embeddings
+TOP_K_RESULTS = 10  # Number of top results to return
+
+# Debugging / Local settings (comment out if using S3 fully)
+# INDEX_FILE = "backend/index.bin"
+# URL_MAPPING_FILE = "backend/url_mapping.json"
+HTML_BASE_PATH = "/path/to/project"
+# ----------------------------------------------
 
 
-def create_search_engine(
-    embeddings_file: str = "backend/index.bin",
-    url_file: str = "backend/url_mapping.json",
-    model_id: str = "BAAI/bge-base-en-v1.5",
-    device: str = "cpu",
-    dim: int = 256,
-    n_results: int = 6
-):
+@dataclass
+class Result:
+    title: str
+    url: str
+    snippet: str
+    text: str
+    distance: float
+
+@dataclass
+class Stats:
+    query_time: float
+    n_urls_searched: int
+
+def load_json_from_file(path: str) -> Dict[str, str]:
+    """ Load a JSON file from a local path or S3. """
+    if path.startswith("s3://"):
+        s3 = boto3.client("s3")
+        bucket, key = path[5:].split("/", 1)
+        obj = s3.get_object(Bucket=bucket, Key=key)
+        content = obj["Body"].read().decode("utf-8")
+        return json.loads(content)
+    else:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+
+
+def load_faiss_index(path: str) -> faiss.Index:
+    """Load a FAISS index from a local file or from S3."""
+    if path.startswith("s3://"):
+        s3 = boto3.client("s3")
+        bucket, key = path[5:].split("/", 1)
+        obj = s3.get_object(Bucket=bucket, Key=key)
+        data = obj["Body"].read()
+        # Convert the raw bytes into a numpy array of uint8
+        data_arr = np.frombuffer(data, dtype=np.uint8)
+        index = faiss.deserialize_index(data_arr)
+        return index
+    else:
+        return faiss.read_index(path)
+
+
+def get_html_text(file_path: str) -> str:
     """
-    Loads embeddings and URL mapping, creates a FAISS index, and loads the model.
-    Returns a `search(query, k=5)` function that can be used repeatedly.
+    Retrieve an HTML file (from S3 or local), parse it with BeautifulSoup,
+    and return its text content.
     """
-    # Load the FAISS index
-    index = faiss.read_index(embeddings_file)
+   
+    try:
+        if file_path.startswith("s3://"):
+            s3 = boto3.client("s3")
+            bucket, key = file_path[5:].split("/", 1)
+            obj = s3.get_object(Bucket=bucket, Key=key)
+            html_content = obj["Body"].read().decode("utf-8")
+        else:
+            with open(file_path, "r", encoding="utf-8") as f:
+                html_content = f.read()
 
-    # Load the URL mapping
-    with open(url_file, "r") as f:
-        url_mapping = json.load(f)
+        soup = BeautifulSoup(html_content, "html.parser")
+        return soup.get_text(separator=" ", strip=True)
+    except:
+        return "This document cannot be found on the server right now. ;-("
 
-    # Load the model
-    model = SentenceTransformer(model_id, device=device)
+def create_search_engine() -> Tuple[callable, Stats]:
+    """
+    Create and return a search function that loads:
+    - FAISS index
+    - URL mapping
+    - SentenceTransformer model
+    """
+    # Load FAISS index
+    log.info("Loading faiss index...")
+    index = load_faiss_index(INDEX_FILE)
+    log.info(f"Loaded FAISS index from {INDEX_FILE}.")
 
-    def search(query: str, k: int = n_results) -> List[Tuple[str, float]]:
+    # Load URL mapping
+    log.info("Loading URL mapping...")
+    url_mapping: Dict[str, str] = load_json_from_file(URL_MAPPING_FILE)
+    total_urls = len(url_mapping)
+    log.info(f"Loaded URL mapping from {URL_MAPPING_FILE} with {total_urls} entries.")
+
+    # Load SentenceTransformer model
+    log.info("Loading model....")
+    model = SentenceTransformer(MODEL_ID, device=DEVICE)
+    log.info(f"Loaded model '{MODEL_ID}' on device {DEVICE}.")
+
+    def search(query: str, k: int = TOP_K_RESULTS) -> Tuple[List[Result], Stats]:
+        """ Perform a search query and return top-k results. """
+        start_time = time.time()
+
         # Encode query
-        query_vector = model.encode(query, convert_to_tensor=False)[:dim]
-        query_vector = np.array(query_vector, dtype='float32').reshape(1, -1)
+        prefix = "Represent this sentence for searching relevant passages: "
+        query_vector = model.encode(prefix + query, convert_to_tensor=False, normalize_embeddings=True)[:FAISS_VECTOR_DIM]
+        query_vector = query_vector.astype("float32").reshape(1, -1)
 
-        # Perform search
-        try:
-            distances, indices = index.search(query_vector, k)
-        except Exception as e:
-            print("ERROR: Faiss index search failed.")
-            print(f"Query vector: {query_vector}")
-            print(f"Error: {e}")
-            return []
+        # FAISS search
+        distances, indices = index.search(query_vector, k)
 
-        # Map results to URLs
-        results = [
-            (url_mapping[idx], distances[0][i])
-            for i, idx in enumerate(indices[0])
-            if idx < len(url_mapping)  # Ensure valid index
-        ]
-        return results
+        results: List[Result] = []
+        for i, idx in enumerate(indices[0]):
+            if idx < 0:
+                continue
+            
+            file_path = url_mapping.get(str(idx), "Unknown URL")
+
+            # Construct full S3 path if needed
+            if not file_path.startswith("s3://") and HTML_BASE_PREFIX:
+                file_path = file_path.replace(HTML_BASE_PATH, "")
+                file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{file_path}"
+                
+
+            snippet = get_html_text(file_path)
+
+            # Extract title
+            title = file_path  # Default to file path
+            try:
+                if file_path.startswith("s3://"):
+                    s3 = boto3.client("s3")
+                    bucket, key = file_path[5:].split("/", 1)
+                    obj = s3.get_object(Bucket=bucket, Key=key)
+                    html_content = obj["Body"].read().decode("utf-8")
+                else:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        html_content = f.read()
+                soup = BeautifulSoup(html_content, "html.parser")
+                if soup.title and soup.title.get_text():
+                    title = soup.title.get_text(strip=True)
+            except Exception as e:
+                print(f"Failed to extract title from {file_path}: {e}")
+
+            results.append(Result(
+                title=title,
+                url=file_path,
+                snippet=snippet,
+                text=snippet,
+                distance=float(distances[0][i])
+            ))
+
+        return results, Stats(query_time=time.time() - start_time, n_urls_searched=total_urls)
 
     return search
 
+# Run search interactively if executed directly
+if __name__ == "__main__":
+    search_func = create_search_engine()
 
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description="FAISS similarity lookup.")
-    parser.add_argument("--embeddings_file", type=str, default="index.bin", help="Path to FAISS index file.")
-    parser.add_argument("--url_file", type=str, default="url_mapping.json", help="Path to URL mapping file.")
-    parser.add_argument("--model_id", type=str, default="BAAI/bge-base-en-v1.5", help="SentenceTransformer model ID.")
-    parser.add_argument("--device", type=str, default="cpu", help="Device to run the model on (e.g., 'cpu', 'cuda').")
-    parser.add_argument("--k", type=int, default=5, help="Number of top similar results to return.")
-    args = parser.parse_args()
-
-    # Create the search engine
-    search_func = create_search_engine(
-        embeddings_file=args.embeddings_file,
-        url_file=args.url_file,
-        model_id=args.model_id,
-        device=args.device
-    )
-
-    # Interactive loop for testing
     while True:
         query = input("Enter a query (or 'exit' to quit): ")
-        if query.lower() == 'exit':
+        if query.lower() == "exit":
             break
 
-        results = search_func(query, k=args.k)
-        print("\nTop results:")
-        for url, dist in results:
-            print(f"URL: {url}, Distance: {dist}")
-
-
-if __name__ == "__main__":
-    main()
+        results, stats = search_func(query, k=TOP_K_RESULTS)
+        print(f"\nQuery took {stats.query_time:.4f} seconds, searched {stats.n_urls_searched} URLs.\n")
+        for res in results:
+            print(f"Title: {res.title}")
+            print(f"URL: {res.url}")
+            print(f"Distance: {res.distance}")
+            print(f"Snippet: {res.snippet}\n")

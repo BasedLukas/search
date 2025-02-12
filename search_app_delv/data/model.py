@@ -1,203 +1,137 @@
 import os
-import gzip
-import dotenv
 import json
+import dotenv
 import numpy as np
+from typing import List, Tuple, Set
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import login
-from typing import List, Tuple, Set
+from tqdm import tqdm  # progress bar
 
 MODEL_ID = "BAAI/bge-base-en-v1.5"
 
-def load_environment():
+def load_environment() -> None:
+    """
+    Loads the environment variables from a .env file and logs into Hugging Face.
+    Expects an environment variable HF_TOKEN to be set.
+    """
     env = dotenv.dotenv_values()
     hf_token = env.get("HF_TOKEN", "")
     if not hf_token:
         raise ValueError("HF_TOKEN is not set in the environment file.")
     login(token=hf_token, add_to_git_credential=True)
 
-def initialize_model(device: str = "cpu") -> SentenceTransformer:
+def initialize_model(device: str = None) -> SentenceTransformer:
+    """
+    Initializes and returns the SentenceTransformer model on the specified device.
+    """
     return SentenceTransformer(MODEL_ID, device=device)
 
-def parse_wet_file(file_path: str) -> List[Tuple[str, str]]:
-    url_content_pairs = []
-    open_func = gzip.open if file_path.endswith('.gz') else open
-    with open_func(file_path, 'rt', encoding='utf-8') as file:
-        url = None
-        content = []
-        for line in file:
-            line = line.strip()
-            if line.startswith("WARC-Target-URI:"):
-                if url and content:
-                    url_content_pairs.append((url, "\n".join(content)))
-                url = line.replace("WARC-Target-URI:", "").strip()
-                content = []
-            elif url:
-                content.append(line)
-        if url and content:
-            url_content_pairs.append((url, "\n".join(content)))
-    return url_content_pairs
+def parse_file(file_path: str) -> Tuple[str, str]:
+    """
+    Reads the file at file_path as a plain string (including HTML tags)
+    and returns a tuple of (file_path, content).
+    """
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    return file_path, content
 
 def embed_content(
     model: SentenceTransformer,
-    url_content_pairs: List[Tuple[str, str]],
-    working_file: str,
+    parsed_files: List[Tuple[str, str]],
+    output_file: str,
     embedding_dim: int,
     batch_size: int,
-    precision: str
-):
-    with open(working_file, "w", encoding="utf-8") as wf:
-        for i in range(0, len(url_content_pairs), batch_size):
-            print(f"Processing batch {i}")
-            batch = url_content_pairs[i : i + batch_size]
-            contents = [text for _, text in batch]
-            batch_embeddings = model.encode(
-                contents,
-                convert_to_tensor=True,
-                batch_size=batch_size,
-                precision=precision
-            )
-            for idx, (url, _) in enumerate(batch):
-                truncated_emb = batch_embeddings[idx][:embedding_dim].tolist()
-                data = {"url": url, "embedding": truncated_emb}
-                json.dump(data, wf, ensure_ascii=False)
-                wf.write("\n")
+    precision: str,
+    device:str
+) -> None:
+    """
+    Given a list of (file_path, content) tuples, computes embeddings in batch
+    and appends each result as a JSON line to the output file.
+    
+    The embedding is truncated (if necessary) to embedding_dim and converted
+    to the specified precision.
+    """
+    texts = [content for _, content in parsed_files]
+    file_paths = [file_path for file_path, _ in parsed_files]
+    
+    # Compute embeddings in one batch
+    embeddings = model.encode(
+        texts,
+        precision=precision, 
+        batch_size=batch_size, 
+        convert_to_numpy=True,
+        device=device,
+        normalize_embeddings=False
+        )
+    
+    with open(output_file, 'a', encoding='utf-8') as wf:
+        for fp, emb in zip(file_paths, embeddings):
+            if len(emb) > embedding_dim:
+                emb = emb[:embedding_dim]
+            emb = np.array(emb, dtype=precision).tolist()
+            record = {"url": fp, "embedding": emb}
+            json.dump(record, wf, ensure_ascii=False)
+            wf.write("\n")
 
-def load_processed_files(metadata_file: str) -> Set[str]:
-    if not os.path.exists(metadata_file):
-        return set()
-    with open(metadata_file, "r", encoding="utf-8") as f:
-        return {line.strip() for line in f}
-
-def append_working_to_permanent(working_file: str, permanent_file: str):
-    with open(working_file, "r", encoding="utf-8") as wf, \
-         open(permanent_file, "a", encoding="utf-8") as pf:
-        for line in wf:
-            pf.write(line)
-    # Clear the working file
-    open(working_file, "w").close()
+def get_processed_files(output_file: str) -> Set[str]:
+    """
+    Reads the output file (if it exists) and returns a set of file paths that have already been processed.
+    """
+    processed: Set[str] = set()
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    try:
+                        record = json.loads(line)
+                        processed.add(record.get("url", ""))
+                    except json.JSONDecodeError:
+                        continue
+    return processed
 
 def process_directory(
     input_dir: str,
-    permanent_file: str,
-    working_file: str,
-    metadata_file: str,
-    device: str = "cpu",
-    batch_size: int = 32,
+    output_file: str,
+    device: str = "cuda",
+    batch_size: int = 64,
     embedding_dim: int = 768,
-    precision: str = "float32"
-):
-    processed_files = load_processed_files(metadata_file)
+    precision: str = "float32",
+    num_cpu_cores: int = 7
+) -> None:
+    """
+    Recursively walks through input_dir to find HTML files.
+    Each unprocessed file (as determined by output_file) is read,
+    embedded, and the result is appended to output_file.
+    
+    If device is 'cpu' and num_cpu_cores is specified, limits PyTorch to the specified number of CPU cores.
+    """
+    if device.lower() == "cpu" and num_cpu_cores is not None:
+        import torch
+        torch.set_num_threads(num_cpu_cores)
     model = initialize_model(device)
-
-    for file_name in os.listdir(input_dir):
-        full_path = os.path.join(input_dir, file_name)
-        # Skip if not a WET file or if already processed
-        if not os.path.isfile(full_path) or not file_name.endswith(".wet.gz"):
-            continue
-        if file_name in processed_files:
-            print(f"Skipping already processed file: {file_name}")
-            continue
-
-        print(f"Processing new file: {file_name}")
-        url_content_pairs = parse_wet_file(full_path)
-        embed_content(
-            model,
-            url_content_pairs,
-            working_file=working_file,
-            embedding_dim=embedding_dim,
-            batch_size=batch_size,
-            precision=precision
-        )
-        append_working_to_permanent(working_file, permanent_file)
-        with open(metadata_file, "a", encoding="utf-8") as mf:
-            mf.write(file_name + "\n")
-        processed_files.add(file_name)
-
-
-def normalize_embeddings(input_file: str, output_file: str):
-    embeddings = []
-    urls = []
-
-    # Read and parse all embeddings from the input file
-    with open(input_file, "r", encoding="utf-8") as f:
-        for line in f:
-            data = json.loads(line.strip())
-            urls.append(data["url"])
-            embeddings.append(data["embedding"])
-
-    arr = np.array(embeddings, dtype=np.float32)  # shape: (num_samples, dims)
-
-    # Compute summary statistics
-    mean = arr.mean(axis=0)  # dimension-wise mean
-    min_ = arr.min(axis=0)
-    max_ = arr.max(axis=0)
-    range_ = np.where(max_ == min_, 1, max_ - min_)  # Avoid division by zero
-
-    # Normalize dimension-wise
-    arr = (arr - mean) / range_
-
-    # Scale to 0-255 and convert to uint8
-    global_min = arr.min()
-    global_max = arr.max()
-    arr = (arr - global_min) / (global_max - global_min) * 255
-    arr = arr.astype(np.uint8)
-
-    # Write summary statistics and normalized embeddings to the output file
-    statistics = {
-        "mean": mean.tolist(),
-        "min": min_.tolist(),
-        "max": max_.tolist(),
-        "global_min": global_min,
-        "global_max": global_max
-    }
-
-    with open(output_file, "w", encoding="utf-8") as wf:
-        # Write the summary statistics as the first line
-        json.dump({"statistics": statistics}, wf, ensure_ascii=False)
-        wf.write("\n")
-
-        # Write the normalized embeddings
-        for url, embedding in zip(urls, arr):
-            data_out = {"url": url, "embedding": embedding.tolist()}
-            json.dump(data_out, wf, ensure_ascii=False)
-            wf.write("\n")
-
-    # Print summary information
-    print("Normalization complete.")
-    print(f"Number of vectors processed: {len(embeddings)}")
-    print(f"Number of dimensions per vector: {arr.shape[1]}")
-    print("Summary statistics written to the output file.")
-
+    processed_files = get_processed_files(output_file)
+    
+    # Gather unprocessed HTML files recursively
+    unprocessed_files: List[str] = []
+    for root, _, files in os.walk(input_dir):
+        for file in files:
+            if file.lower().endswith(".html"):
+                full_path = os.path.join(root, file)
+                if full_path in processed_files:
+                    continue
+                unprocessed_files.append(full_path)
+    
+    # Process files in batches with a progress bar
+    for i in tqdm(range(0, len(unprocessed_files), batch_size), desc="Processing files"):
+        batch_files = unprocessed_files[i:i + batch_size]
+        parsed_files = [parse_file(fp) for fp in batch_files]
+        embed_content(model, parsed_files, output_file, embedding_dim, batch_size, precision,device=device)
 
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Process WET files and embed content with restart capability.")
-    parser.add_argument("--input_dir", type=str, default="downloaded_wets", help="Directory containing WET files.")
-    parser.add_argument("--output_file", type=str, default="out.json", help="Permanent JSON lines file.")
-    parser.add_argument("--working_file", type=str, default="temp.json", help="Working JSON lines file.")
-    parser.add_argument("--metadata_file", type=str, default="processing_metadata", help="File listing processed WET files.")
-    parser.add_argument("--device", type=str, default="cuda", help="Device to run the model on (e.g., 'cpu', 'cuda').")
-    parser.add_argument("--batch_size", type=int, default=128, help="Batch size for embedding.")
-    parser.add_argument("--embedding_dim", type=int, default=256, help="Size of the embedding to store.")
-    parser.add_argument("--precision", type=str, default="float32", help="Precision for the embeddings.")
-
-    args = parser.parse_args()
     load_environment()
-
-    # process_directory(
-    #     input_dir=args.input_dir,
-    #     permanent_file=args.output_file,
-    #     working_file=args.working_file,
-    #     metadata_file=args.metadata_file,
-    #     device=args.device,
-    #     batch_size=args.batch_size,
-    #     embedding_dim=args.embedding_dim,
-    #     precision=args.precision
-    # )
-
-    normalize_embeddings(
-        input_file=args.output_file,
-        output_file="../backend/embeddings.json"
-    )
+    
+    # Set your input directory and output file path accordingly.
+    INPUT_DIR = "/path/to/project"
+    OUTPUT_FILE = "/path/to/project"
+    
+    process_directory(INPUT_DIR, OUTPUT_FILE)

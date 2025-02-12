@@ -8,32 +8,33 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
 </head>
 <body>
+  <div class="container">
     <div class="search-bar">
-        <form action="/search" method="get">
-            <input type="text" name="query" placeholder="Search again..." value="{{ query }}" autofocus>
-            <input type="submit" value="Search">
-        </form>
+      <form class="search-form" action="/search" method="get">
+        <input type="text" name="query" placeholder="Search again..." value="{{ query }}" autofocus>
+        <input type="submit" value="Search">
+      </form>
     </div>
-    <div class="results-container">
-        <h1>Search Results for "{{ query }}"</h1>
-        
-        <div class="stats">
-            <p><strong>Query Time:</strong> {{ stats.query_time | round(4) }} seconds</p>
-            <p><strong>URLs Searched:</strong> {{ stats.n_urls_searched }}</p>
-        </div>
-
-        <div class="results-grid">
-            <ul>
-                {% for result in my_results %}
-                    <li>
-                        <a href="{{ result.url }}">{{ result.title }}</a>
-                        <p>{{ result.snippet }}</p>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <a href="/">Back to Search</a>
+    <div class="stats">
+      <p><strong>Query Time:</strong> {{ stats.query_time | round(4) }} seconds</p>
+      <p><strong>URLs Searched:</strong> {{ stats.n_urls_searched }}</p>
     </div>
+    <h1>Search Results for "{{ query }}"</h1>
+    <div class="results-list">
+      {% for result in my_results %}
+      <div class="result-item">
+        <h2><a href="{{ result.url }}">{{ result.title }}</a></h2>
+        <p>
+          <strong>Text:</strong>
+          {{ result.text[:200] }}{% if result.text|length > 200 %}...{% endif %}
+        </p>
+        <p><strong>Distance:</strong> {{ result.distance }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="back-link">
+      <a href="/">Back to Search</a>
+    </div>
+  </div>
 </body>
 </html>
