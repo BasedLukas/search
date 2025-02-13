@@ -34,6 +34,7 @@ def results_page() -> Any:
         html_cache[unique_id] = result.html
         # Add a new attribute to the result for the template.
         result.html_id = unique_id
+        log.info(f"html {result.html[:20]}")
 
     return render_template(
         'results.html',

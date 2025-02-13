@@ -20,37 +20,35 @@ The URL mapping (from vector ID to document path) is saved in a separate JSON fi
 import argparse
 import json
 from typing import List, Dict, Any, Tuple, Optional
-
 import faiss
 import numpy as np
+from multiprocessing import Pool
 
 
-def parse_jsonl_file(filepath: str) -> Tuple[np.ndarray, List[str]]:
+def process_line(line: str) -> Tuple[np.ndarray, str]:
     """
-    Reads the JSONL file and returns a tuple:
-      (embeddings_array, url_mapping)
-    embeddings_array is a 2D numpy float32 array (n_vectors x d)
-    url_mapping is a list of URLs (or file paths) such that url_mapping[i] is the source for row i.
-    
-    Assumes each line is a JSON object with keys "url" and "embedding".
+    Process a single JSONL line.
+      {"url": "<url>", "embedding": [<float>, <float>, ...]}
     """
-    embeddings: List[List[float]] = []
-    urls: List[str] = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-                urls.append(record["url"])
-                embeddings.append(record["embedding"])
-            except (json.JSONDecodeError, KeyError) as e:
-                print(f"Skipping invalid line: {line} ({e})")
-    if not embeddings:
-        raise ValueError("No embeddings found in the file.")
-    embeddings_np = np.array(embeddings, dtype='float32')
-    return embeddings_np, urls
+    data = json.loads(line)
+    url = data["url"]
+    vector = np.array(data["embedding"], dtype=np.float32)
+    return vector, url
+
+
+def parse_jsonl_file(filepath: str) -> Tuple[List[np.ndarray], List[str]]:
+    """
+    Parse a JSONL file using multiprocessing.
+    Returns:
+      A tuple (vectors, urls) where each vector corresponds to its URL.
+    """
+    with open(filepath, 'r', encoding='utf-8') as f:
+        with Pool() as pool:
+            # Adjust chunksize to balance performance and IPC overhead.
+            pairs = pool.imap(process_line, f, chunksize=50)
+            pairs = list(pairs)
+    vectors, urls = zip(*pairs)
+    return np.array(vectors), list(urls)
 
 
 def build_faiss_index(
@@ -60,9 +58,9 @@ def build_faiss_index(
     nlist: int = 100,      # For IVF indices
     m: int = 8,            # For IVF-PQ: number of subquantizers
     nbits: int = 8,        # For IVF-PQ: bits per subvector
-    hnsw_M: int = 32,      # For HNSW: number of neighbors per node
-    efConstruction: int = 40,  # For HNSW: graph construction depth
-    efSearch: int = 16,        # For HNSW: search depth
+    hnsw_M: int = 64,      # For HNSW: number of neighbors per node
+    efConstruction: int = 64,  # For HNSW: graph construction depth
+    efSearch: int = 64,        # For HNSW: search depth
     metric: str = "L2"         # Currently only L2 supported; could extend to IP.
 ) -> faiss.Index:
     """
@@ -208,11 +206,11 @@ if __name__ == "__main__":
     parser.add_argument("--m", type=int, default=8, help="Number of subquantizers for IVF-PQ.")
     parser.add_argument("--nbits", type=int, default=8, help="Number of bits per subvector for IVF-PQ.")
     # HNSW parameters
-    parser.add_argument("--hnsw_M", type=int, default=32, help="Number of connections per node for HNSW.")
-    parser.add_argument("--efConstruction", type=int, default=40, help="efConstruction for HNSW (index build exploration depth).")
-    parser.add_argument("--efSearch", type=int, default=16, help="efSearch for HNSW (search exploration depth).")
+    parser.add_argument("--hnsw_M", type=int, default=64, help="Number of connections per node for HNSW.")
+    parser.add_argument("--efConstruction", type=int, default=64, help="efConstruction for HNSW (index build exploration depth).")
+    parser.add_argument("--efSearch", type=int, default=64, help="efSearch for HNSW (search exploration depth).")
     # Metric and training size for IVF indexes
     parser.add_argument("--metric", type=str, default="L2", help="Distance metric to use (default L2).")
-    parser.add_argument("--train_size", type=int, default=100000, help="Number of vectors to use for training IVF indices.")
+    parser.add_argument("--train_size", type=int, default=1000000, help="Number of vectors to use for training IVF indices.")
     args = parser.parse_args()
     main(args)

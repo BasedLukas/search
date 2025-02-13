@@ -6,7 +6,6 @@ extracts text (for the snippet), and attempts to extract the title.
 
 Each result is returned as a `Result` object with title, URL, snippet, text, and distance.
 """
-
 import time
 import json
 import faiss
@@ -42,6 +41,7 @@ else:
 # SentenceTransformer model settings
 MODEL_ID = "BAAI/bge-base-en-v1.5"  # Model for text embeddings
 DEVICE = "cpu"  # Change to 'cuda' if running on GPU
+
 # FAISS index settings
 FAISS_VECTOR_DIM = 768  # Dimensionality of the embeddings
 TOP_K_RESULTS = 10  # Number of top results to return
@@ -62,6 +62,7 @@ class Stats:
     query_time: float
     n_urls_searched: int
 
+
 def load_json_from_file(path: str) -> Dict[str, str]:
     """ Load a JSON file from a local path or S3. """
     if path.startswith("s3://"):
@@ -73,7 +74,6 @@ def load_json_from_file(path: str) -> Dict[str, str]:
     else:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
-
 
 
 def load_faiss_index(path: str) -> faiss.Index:
@@ -112,6 +112,42 @@ def get_html_text(file_path: str) -> str:
     except:
         return "This document cannot be found on the server right now. ;-("
 
+
+def fetch_results(distances, indices, url_mapping):
+    results: List[Result] = []
+    for i, idx in enumerate(indices[0]):
+        if idx < 0:
+            continue
+        
+        file_path = url_mapping.get(str(idx), "Unknown URL")
+        if not DEV:
+            file_path = file_path.replace(HTML_BASE_PATH, "")
+            file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{file_path}"
+        fulltext = get_html_text(file_path)
+
+        try:
+            if file_path.startswith("s3://"):
+                s3 = boto3.client("s3")
+                bucket, key = file_path[5:].split("/", 1)
+                obj = s3.get_object(Bucket=bucket, Key=key)
+                html_content = obj["Body"].read().decode("utf-8")
+            else:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    html_content = f.read()
+        except Exception as e:
+            log.warning(f"Failed to extract title from {file_path}: {e}")
+
+        results.append(Result(
+            title="",
+            url=file_path,
+            snippet=fulltext,
+            text=fulltext[:250],
+            html=html_content,
+            distance=float(distances[0][i])
+        ))
+    return results
+
+
 def create_search_engine() -> Tuple[callable, Stats]:
     """
     Create and return a search function that loads:
@@ -119,73 +155,34 @@ def create_search_engine() -> Tuple[callable, Stats]:
     - URL mapping
     - SentenceTransformer model
     """
-    # Load FAISS index
+
     log.info("Loading faiss index...")
     index = load_faiss_index(INDEX_FILE)
     log.info(f"Loaded FAISS index from {INDEX_FILE}.")
-
-    # Load URL mapping
     log.info("Loading URL mapping...")
     url_mapping: Dict[str, str] = load_json_from_file(URL_MAPPING_FILE)
     total_urls = len(url_mapping)
     log.info(f"Loaded URL mapping from {URL_MAPPING_FILE} with {total_urls} entries.")
-
-    # Load SentenceTransformer model
     log.info("Loading model....")
     model = SentenceTransformer(MODEL_ID, device=DEVICE)
     log.info(f"Loaded model '{MODEL_ID}' on device {DEVICE}.")
+
 
     def search(query: str, k: int = TOP_K_RESULTS) -> Tuple[List[Result], Stats]:
         """ Perform a search query and return top-k results. """
         start_time = time.time()
 
-        # Encode query
         prefix = "Represent this sentence for searching relevant passages: "
-        query_vector = model.encode(prefix + query, convert_to_tensor=False, normalize_embeddings=True)[:FAISS_VECTOR_DIM]
+        query_vector = model.encode(
+            prefix + query, 
+            convert_to_tensor=False, 
+            normalize_embeddings=True
+            )[:FAISS_VECTOR_DIM]
         query_vector = query_vector.astype("float32").reshape(1, -1)
-
-        # FAISS search
         distances, indices = index.search(query_vector, k)
-
-        results: List[Result] = []
-        for i, idx in enumerate(indices[0]):
-            if idx < 0:
-                continue
-            
-            file_path = url_mapping.get(str(idx), "Unknown URL")
-
-            # Construct full S3 path if needed
-            if not file_path.startswith("s3://") and HTML_BASE_PREFIX:
-                file_path = file_path.replace(HTML_BASE_PATH, "")
-                file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{file_path}"
-                
-
-            fulltext = get_html_text(file_path)
-
-            # Extract title
-            title = file_path  # Default to file path
-            try:
-                if file_path.startswith("s3://"):
-                    s3 = boto3.client("s3")
-                    bucket, key = file_path[5:].split("/", 1)
-                    obj = s3.get_object(Bucket=bucket, Key=key)
-                    html_content = obj["Body"].read().decode("utf-8")
-                else:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        html_content = f.read()
-            except Exception as e:
-                print(f"Failed to extract title from {file_path}: {e}")
-
-            results.append(Result(
-                title=title,
-                url=file_path,
-                snippet=fulltext,
-                text=fulltext[:250],
-                html=html_content,
-                distance=float(distances[0][i])
-            ))
-
-        return results, Stats(query_time=time.time() - start_time, n_urls_searched=total_urls)
+        results = fetch_results(distances, indices, url_mapping)
+        stats = Stats(query_time=time.time() - start_time, n_urls_searched=total_urls)
+        return results, stats
 
     return search
 
