@@ -17,7 +17,7 @@
 
 /* Reduced line spacing for the description paragraph */
 .description {
-    line-height: 1.4;
+    line-height: 1;
 }
 
 /* Make warning text red */

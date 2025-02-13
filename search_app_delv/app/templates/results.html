@@ -6,6 +6,18 @@
   <title>Search Results</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+
+  <script>
+    // Clicking the HTML toggles expansion/contraction.
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.result-html').forEach(function(el) {
+        el.addEventListener('click', function() {
+          el.classList.toggle('expanded');
+        });
+      });
+    });
+  </script>
+
 </head>
 <body>
   <div class="container">
@@ -15,6 +27,9 @@
         <input type="submit" value="Search">
       </form>
     </div>
+    <div class="back-link">
+      <a href="/">Back to Search</a>
+    </div>
     <div class="stats">
       <p><strong>Query Time:</strong> {{ stats.query_time | round(4) }} seconds</p>
       <p><strong>URLs Searched:</strong> {{ stats.n_urls_searched }}</p>
@@ -23,9 +38,10 @@
     <div class="results-list">
       {% for result in my_results %}
       <div class="result-item">
-        <p class="result-text">{{ result.text }}</p>
-        <!-- Link now sends the unique ID instead of the full HTML -->
-        <a class="view-html-link" href="/view_html?id={{ result.html_id }}">View HTML</a>
+        <!-- Show the HTML directly, truncated to a set number of lines -->
+        <div class="result-html" style="--default-lines: {{ default_lines }};">
+          {{ result.html | safe }}
+        </div>
         <p class="result-distance"><strong>Distance:</strong> {{ result.distance }}</p>
       </div>
       {% endfor %}
