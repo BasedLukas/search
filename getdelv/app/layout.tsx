@@ -13,12 +13,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Delv",
+  title: "getDelv",
   description: "Coding docs for machines",
   icons: {
     icon: "/favicon-32x32.png",
     apple: "/apple-touch-icon.png",
     shortcut: "/favicon.ico",
+  },
+  openGraph: {
+    title: "getDelv",
+    description: "Coding docs for machines",
+    url: "https://getdelv.com",
+    siteName: "Delv",
+    images: [
+      {
+        url: "/shareimage.png", 
+        width: "auto",
+        height: "auto",
+        alt: "Preview of Delv",
+      },
+    ],
+    type: "website",
   },
 };
 
