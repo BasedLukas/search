@@ -15,6 +15,19 @@ export default function Home() {
           Whether it&apos;s API specs or bug reports, delv delivers the answers
           they need.
         </p>
+
+        {/* Responsive YouTube embed */}
+        {/* <div className="relative w-full max-w-xl h-0 pb-[56.25%]">
+          <iframe
+            className="absolute top-0 left-0 w-full h-full"
+            src="https://example.invalid"
+            title="Demo video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div> */}
+        
         <p className="text-lg sm:text-xl">Coming Soon…</p>
       </main>
     </div>
