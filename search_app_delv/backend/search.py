@@ -59,7 +59,9 @@ class Result:
 
 @dataclass
 class Stats:
+    embedding_time: float
     query_time: float
+    retrieval_time: float
     n_urls_searched: int
 
 
@@ -170,7 +172,7 @@ def create_search_engine() -> Tuple[callable, Stats]:
 
     def search(query: str, k: int = TOP_K_RESULTS) -> Tuple[List[Result], Stats]:
         """ Perform a search query and return top-k results. """
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         prefix = "Represent this sentence for searching relevant passages: "
         query_vector = model.encode(
@@ -178,10 +180,17 @@ def create_search_engine() -> Tuple[callable, Stats]:
             convert_to_tensor=False, 
             normalize_embeddings=True
             )[:FAISS_VECTOR_DIM]
+        embedding_time = time.perf_counter()
         query_vector = query_vector.astype("float32").reshape(1, -1)
         distances, indices = index.search(query_vector, k)
+        query_time = time.perf_counter()
         results = fetch_results(distances, indices, url_mapping)
-        stats = Stats(query_time=time.time() - start_time, n_urls_searched=total_urls)
+        retrieval_time = time.perf_counter()
+        stats = Stats(
+            embedding_time=embedding_time-start_time,
+            query_time=query_time-embedding_time,
+            retrieval_time=retrieval_time-embedding_time, 
+            n_urls_searched=total_urls)
         return results, stats
 
     return search

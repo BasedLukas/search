@@ -1,3 +1,4 @@
+/* app/static/results.css */
 /* Results Page Specific Styles */
 
 /* Search Bar Styles */
@@ -124,4 +125,12 @@ h1 {
 
 .result-html.expanded {
     -webkit-line-clamp: unset;
+}
+
+/* Additional mobile spacing for result items */
+@media (max-width: 600px) {
+    .result-item {
+        margin-left: 15px;
+        margin-right: 15px;
+    }
 }

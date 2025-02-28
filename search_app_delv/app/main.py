@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 from backend.main import search
 from backend.logs import logger as log
 from typing import Any
@@ -29,6 +29,27 @@ def results_page() -> Any:
         stats=stats,
         default_lines=default_lines
     )
+
+snow_answer = open("snow").read()
+@app.route("/api", methods=["POST"])
+def api_endpoint():
+    data = request.get_json()
+    query = data.get("query")
+    if not query:
+        log.info("Error, no query provided")
+        return jsonify({"error": "No query provided"}), 400
+    if "snow" in query.lower():
+        log.info(f"search result (truncated):{snow_answer[:50]}")
+        return snow_answer
+
+
+    results = search(query)
+    log.info(f"search result (truncated):{results.text[:50]}")
+    return jsonify({
+        "result0": results["results"][0].html,
+        "result1": results["results"][1].html,
+        "result2": results["results"][2].html,
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

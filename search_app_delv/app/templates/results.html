@@ -31,7 +31,9 @@
       <a href="/">Back to Search</a>
     </div>
     <div class="stats">
+      <p><strong>Embedding Time:</strong> {{ stats.embedding_time | round(4) }} seconds</p>
       <p><strong>Query Time:</strong> {{ stats.query_time | round(4) }} seconds</p>
+      <p><strong>Retrieval Time:</strong> {{ stats.retrieval_time | round(4) }} seconds</p>
       <p><strong>URLs Searched:</strong> {{ stats.n_urls_searched }}</p>
     </div>
     <h1>Search Results for "{{ query }}"</h1>

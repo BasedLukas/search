@@ -10,7 +10,7 @@ WorkingDirectory=/path/to/project
 Environment="PATH=/path/to/project"
 Restart=always  # Ensure the service restarts if it crashes
 RestartSec=5    # Delay before restarting the service
-ExecStart=/path/to/project --workers 2 --bind 127.0.0.1:5000 --log-level=debug --capture-output application:app
+ExecStart=/path/to/project --workers 1 --bind 127.0.0.1:5000 --log-level=info --capture-output application:app
 
 [Install]
 WantedBy=multi-user.target
