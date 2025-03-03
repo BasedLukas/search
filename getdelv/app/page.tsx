@@ -29,6 +29,9 @@ export default function Home() {
         </div> */}
         
         <p className="text-lg sm:text-xl">Coming Soon…</p>
+        <a href="mailto:contact@example.invalid" className="text-lg sm:text-xl">
+          contact@example.invalid
+        </a>
       </main>
     </div>
   );
