@@ -2,13 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Define the muted retro color scheme */
 :root {
-  --font-geist-sans: 'Geist', sans-serif;
-  --font-geist-mono: 'Geist Mono', monospace;
+  --bg-muted: #f4f1ea;
+  --header-bg: #ded9cf;
+  --content-bg: #e8e3da;
+  --border-light: #c2b9a9;
+  --primary-text: #2d2c2b;
+  --secondary-text: #5c5b5a;
+  --accent: #7a5c45;
 }
 
 body {
-  font-family: var(--font-geist-sans);
+  font-family: 'Geist', sans-serif;
+  background-color: var(--bg-muted);
+  color: var(--primary-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-} 
+}
+
+/* General Styling */
+.bg-muted-bg { background-color: var(--bg-muted); }
+.bg-header-bg { background-color: var(--header-bg); }
+.bg-content-bg { background-color: var(--content-bg); }
+.text-primary-text { color: var(--primary-text); }
+.text-secondary-text { color: var(--secondary-text); }
+.text-accent { color: var(--accent); }
+.border-border-light { border-color: var(--border-light); }
