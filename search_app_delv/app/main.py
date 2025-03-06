@@ -30,7 +30,6 @@ def results_page() -> Any:
         default_lines=default_lines
     )
 
-snow_answer = open("snow").read()
 @app.route("/api", methods=["POST"])
 def api_endpoint():
     data = request.get_json()
@@ -38,10 +37,6 @@ def api_endpoint():
     if not query:
         log.info("Error, no query provided")
         return jsonify({"error": "No query provided"}), 400
-    if "snow" in query.lower():
-        log.info(f"search result (truncated):{snow_answer[:50]}")
-        return snow_answer
-
 
     results = search(query)
     log.info(f"search result (truncated):{results.text[:50]}")

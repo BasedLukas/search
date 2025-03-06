@@ -1,0 +1,26 @@
+[project]
+name = "search_app_delv"
+version = "0.1.0"
+description = "Search application"
+requires-python = ">=3.8"
+dependencies = [
+    "botocore",
+    "flask",
+    "python-dotenv",
+    "requests",
+    "gunicorn",
+    "boto3",
+    "sentence-transformers",
+    "transformers",
+    "jinja2",
+    "tqdm",
+    "beautifulsoup4",
+    "faiss-cpu"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]

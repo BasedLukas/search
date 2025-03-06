@@ -13,6 +13,7 @@ import boto3
 import io
 import dotenv
 import numpy as np
+import os
 from sentence_transformers import SentenceTransformer
 from typing import List, Tuple, Dict
 from dataclasses import dataclass
@@ -21,22 +22,20 @@ from backend.logs import logger as log
 
 # ---------------- CONFIGURATION ----------------
 env = dotenv.dotenv_values()
-DEV = env.get("DEV") == "True"
+USE_LOCAL = True  # Set to True to use local files (with download if needed)
 
-if DEV:
-    log.warning("ON DEV MODE")
-    HTML_BASE_PREFIX = None
-    INDEX_FILE = "backend/index.bin"
-    URL_MAPPING_FILE = "backend/url_mapping.json"
-    HTML_BASE_PATH = "/path/to/project"
-else:
-    log.warning("ON PROD MODE")
-    HTML_BASE_PREFIX = "docs/"  # Folder inside the bucket where HTML files are stored
-    S3_BUCKET = "example-resource"
-    INDEX_FILE = f"s3://{S3_BUCKET}/index.bin"
-    URL_MAPPING_FILE = f"s3://{S3_BUCKET}/url_mapping.json"
-    HTML_BASE_PATH = "/path/to/project"
+# S3 configuration
+S3_BUCKET = "example-resource"
+HTML_BASE_PREFIX = "docs/"  # Folder inside the bucket where HTML files are stored
 
+# Local file paths
+LOCAL_INDEX_FILE = "backend/index.bin"
+LOCAL_URL_MAPPING_FILE = "backend/url_mapping.json"
+HTML_BASE_PATH = "/path/to/project"
+
+# S3 paths
+S3_INDEX_FILE = f"s3://{S3_BUCKET}/index.bin"
+S3_URL_MAPPING_FILE = f"s3://{S3_BUCKET}/url_mapping.json"
 
 # SentenceTransformer model settings
 MODEL_ID = "BAAI/bge-base-en-v1.5"  # Model for text embeddings
@@ -54,7 +53,7 @@ class Result:
     url: str
     snippet: str
     text: str
-    html:str
+    html: str
     distance: float
 
 @dataclass
@@ -65,31 +64,68 @@ class Stats:
     n_urls_searched: int
 
 
+def download_from_s3(s3_path: str, local_path: str) -> bool:
+    """Download a file from S3 to a local path. Returns True if successful."""
+    try:
+        s3 = boto3.client("s3")
+        bucket, key = s3_path[5:].split("/", 1)
+        log.info(f"Downloading {s3_path} to {local_path}")
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        s3.download_file(Bucket=bucket, Key=key, Filename=local_path)
+        log.info(f"Successfully downloaded {s3_path} to {local_path}")
+        return True
+    except Exception as e:
+        log.error(f"Failed to download {s3_path}: {e}")
+        return False
+
+
 def load_json_from_file(path: str) -> Dict[str, str]:
-    """ Load a JSON file from a local path or S3. """
-    if path.startswith("s3://"):
+    """Load a JSON file from a local path or S3."""
+    if USE_LOCAL and path.startswith("s3://"):
+        # Use local file with download if needed
+        if not os.path.exists(LOCAL_URL_MAPPING_FILE):
+            log.info(f"URL mapping not found locally, downloading from {path}")
+            download_from_s3(path, LOCAL_URL_MAPPING_FILE)
+        
+        log.info(f"Loading URL mapping from local file: {LOCAL_URL_MAPPING_FILE}")
+        with open(LOCAL_URL_MAPPING_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    elif path.startswith("s3://"):
+        # Direct S3 access
         s3 = boto3.client("s3")
         bucket, key = path[5:].split("/", 1)
         obj = s3.get_object(Bucket=bucket, Key=key)
         content = obj["Body"].read().decode("utf-8")
         return json.loads(content)
     else:
+        # Local file
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
 
 def load_faiss_index(path: str) -> faiss.Index:
     """Load a FAISS index from a local file or from S3."""
-    if path.startswith("s3://"):
+    if USE_LOCAL and path.startswith("s3://"):
+        # Use local file with download if needed
+        if not os.path.exists(LOCAL_INDEX_FILE):
+            log.info(f"Index not found locally, downloading from {path}")
+            download_from_s3(path, LOCAL_INDEX_FILE)
+        
+        log.info(f"Loading index from local file: {LOCAL_INDEX_FILE}")
+        index = faiss.read_index(LOCAL_INDEX_FILE)
+        return index
+    elif path.startswith("s3://"):
+        # Direct S3 access
         s3 = boto3.client("s3")
         bucket, key = path[5:].split("/", 1)
         obj = s3.get_object(Bucket=bucket, Key=key)
         data = obj["Body"].read()
-        # Convert the raw bytes into a numpy array of uint8
         data_arr = np.frombuffer(data, dtype=np.uint8)
         index = faiss.deserialize_index(data_arr)
         return index
     else:
+        # Local file
         return faiss.read_index(path)
 
 
@@ -98,7 +134,6 @@ def get_html_text(file_path: str) -> str:
     Retrieve an HTML file (from S3 or local), parse it with BeautifulSoup,
     and return its text content.
     """
-   
     try:
         if file_path.startswith("s3://"):
             s3 = boto3.client("s3")
@@ -122,26 +157,23 @@ def fetch_results(distances, indices, url_mapping):
             continue
         
         file_path = url_mapping.get(str(idx), "Unknown URL")
-        if not DEV:
-            file_path = file_path.replace(HTML_BASE_PATH, "")
-            file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{file_path}"
-        fulltext = get_html_text(file_path)
+        # HTML content always from S3 regardless of USE_LOCAL setting
+        s3_file_path = file_path.replace(HTML_BASE_PATH, "")
+        s3_file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{s3_file_path}"
+        fulltext = get_html_text(s3_file_path)
 
         try:
-            if file_path.startswith("s3://"):
-                s3 = boto3.client("s3")
-                bucket, key = file_path[5:].split("/", 1)
-                obj = s3.get_object(Bucket=bucket, Key=key)
-                html_content = obj["Body"].read().decode("utf-8")
-            else:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    html_content = f.read()
+            s3 = boto3.client("s3")
+            bucket, key = s3_file_path[5:].split("/", 1)
+            obj = s3.get_object(Bucket=bucket, Key=key)
+            html_content = obj["Body"].read().decode("utf-8")
         except Exception as e:
-            log.warning(f"Failed to extract title from {file_path}: {e}")
+            log.warning(f"Failed to extract title from {s3_file_path}: {e}")
+            html_content = ""
 
         results.append(Result(
             title="",
-            url=file_path,
+            url=s3_file_path,
             snippet=fulltext,
             text=fulltext[:250],
             html=html_content,
@@ -157,18 +189,19 @@ def create_search_engine() -> Tuple[callable, Stats]:
     - URL mapping
     - SentenceTransformer model
     """
-
     log.info("Loading faiss index...")
-    index = load_faiss_index(INDEX_FILE)
-    log.info(f"Loaded FAISS index from {INDEX_FILE}.")
+    faiss.omp_set_num_threads(1)
+    index = load_faiss_index(S3_INDEX_FILE)
+    log.info(f"Loaded FAISS index successfully.")
+    
     log.info("Loading URL mapping...")
-    url_mapping: Dict[str, str] = load_json_from_file(URL_MAPPING_FILE)
+    url_mapping: Dict[str, str] = load_json_from_file(S3_URL_MAPPING_FILE)
     total_urls = len(url_mapping)
-    log.info(f"Loaded URL mapping from {URL_MAPPING_FILE} with {total_urls} entries.")
+    log.info(f"Loaded URL mapping with {total_urls} entries.")
+    
     log.info("Loading model....")
     model = SentenceTransformer(MODEL_ID, device=DEVICE)
     log.info(f"Loaded model '{MODEL_ID}' on device {DEVICE}.")
-
 
     def search(query: str, k: int = TOP_K_RESULTS) -> Tuple[List[Result], Stats]:
         """ Perform a search query and return top-k results. """
