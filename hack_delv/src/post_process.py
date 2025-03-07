@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def extract_structured_content(url: str) -> str:
+def post_process(url: str) -> str:
     """
     Fetch a webpage and extract structured content including title, description, 
     and main text elements. It removes irrelevant tags (like scripts and styles) 
@@ -68,5 +68,5 @@ def extract_structured_content(url: str) -> str:
 if __name__ == "__main__":
     url = ("https://docs.snowflake.com/en/developer-guide/snowflake-python-api/"
            "reference/latest/_autosummary/snowflake.core.Root")
-    structured_text = extract_structured_content(url)
+    structured_text = post_process(url)
     print(structured_text)
