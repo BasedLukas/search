@@ -26,7 +26,7 @@ def fetch_data(search_term: str) -> requests.Response:
     return response
 
 if __name__ == "__main__":
-    term: str = "snowflake.core Root Account creation syntax python"
+    term: str = "Converting a sympy polynomial into a list of coefficients"
     response: requests.Response = fetch_data(term)
     
     print("Status Code:", response.status_code)

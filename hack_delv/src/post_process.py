@@ -66,7 +66,8 @@ def post_process(url: str) -> str:
 
 
 if __name__ == "__main__":
-    url = ("https://docs.snowflake.com/en/developer-guide/snowflake-python-api/"
-           "reference/latest/_autosummary/snowflake.core.Root")
+    url = ("https://example.invalid")
     structured_text = post_process(url)
     print(structured_text)
+
+    

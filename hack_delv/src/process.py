@@ -16,7 +16,7 @@ def valid_query(query: str)->bool:
 
 
 def process_results(query: str)->str:
-    """get user query, quety brave and post process the resut to return a paragraph of text"""
+    """get user query, query brave and post process the result to return a paragraph of text"""
     if not BRAVE_API_KEY:
         return "Backend error; please tell us that out env variable is not set"
     if not valid_query(query):
