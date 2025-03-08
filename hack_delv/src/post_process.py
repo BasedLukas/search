@@ -52,10 +52,6 @@ def post_process(url: str) -> str:
     # Get the cleaned inner HTML of the main content.
     content_html = main_content.decode_contents()
 
-    # Debug: write the cleaned HTML structure to a file.
-    with open("cleaned_soup.html", "w", encoding="utf-8") as f:
-        f.write(main_content.prettify())
-
     # Build the final XML-like structure with title, description, and content.
     result = f"<document>\n  <title>{title}</title>\n"
     if description:
@@ -70,4 +66,3 @@ if __name__ == "__main__":
     structured_text = post_process(url)
     print(structured_text)
 
-    

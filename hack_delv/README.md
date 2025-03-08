@@ -9,15 +9,31 @@ curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d
 ```
 
 ## Deployment to AWS Lambda
-
-```bash
+# Login to AWS ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 000000000000.dkr.ecr.us-east-1.amazonaws.com
+
+# Set your API key
 export BRAVE_API_KEY=""
-docker buildx create --use
-docker buildx build --platform linux/amd64 --build-arg BRAVE_API_KEY=${BRAVE_API_KEY} -t getdelv --load .
+
+# Setup buildx for cross-platform building
+docker buildx rm mybuilder || true
+docker buildx create --name mybuilder --use
+
+# Build for AMD64 (AWS Lambda architecture) and load locally
+docker buildx build --platform=linux/amd64 \
+  --build-arg BRAVE_API_KEY=${BRAVE_API_KEY} \
+  -t getdelv:latest \
+  --load .
+
+# Verify architecture is correct
+docker inspect getdelv:latest --format='{{.Architecture}}'
+
+# Tag and push to ECR
 docker tag getdelv:latest 000000000000.dkr.ecr.us-east-1.amazonaws.com/getdelv:latest
 docker push 000000000000.dkr.ecr.us-east-1.amazonaws.com/getdelv:latest
-# go to aws and update lambda to tag latest
+
+# Go to AWS and update lambda to use the latest tag
+
+# Test the deployed API
 curl -X GET "https://example.invalid" \
   -H "x-api-key: [api key]"
-```
