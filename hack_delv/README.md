@@ -10,8 +10,11 @@ curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d
 
 ## Deployment to AWS Lambda
 Set your API key, then build and deploy
+```
 export BRAVE_API_KEY=""
 ./build_and_deploy_to_lambda.sh
+```
+Go to AWS and chose the latest tag as the lambda function
 
 # Test the deployed API
 export MY_API_KEY=""

@@ -14,9 +14,27 @@ def valid_query(query: str)->bool:
         return False
     return True
 
+def valid_url(url: str)->bool:
+    """test that url exists and is a valid URL format"""
+    if not url:
+        return False
+    # Basic URL validation - should start with http:// or https://
+    if not url.startswith(('http://', 'https://')):
+        return False
+    return True
+
+def process_url(url: str)->str:
+    """directly process a URL through post_process"""
+    if not valid_url(url):
+        return "Invalid URL; URL must start with http:// or https://"
+    
+    try:
+        return post_process(url)
+    except Exception as e:
+        return f"Error processing URL: {str(e)}"
 
 def process_results(query: str)->str:
-    """get user query, query brave and post process the result to return a paragraph of text"""
+    """get user query, query brave and return a list of urls the model can choose from"""
     if not BRAVE_API_KEY:
         return "Backend error; please tell us that out env variable is not set"
     if not valid_query(query):
@@ -33,7 +51,7 @@ def process_results(query: str)->str:
     goggles = 'https://example.invalid'
     params = {
         'q': query,
-        'count': 1,
+        'count': 10,
         'offset': 0,
         'text_decorations': False,
         'spellcheck': False,
@@ -50,9 +68,8 @@ def process_results(query: str)->str:
         timeout=5
     )
     if response.status_code == 200:
-        url = response.json()['web']['results'][0]['url']
-        data = post_process(url)
-        return data
+        urls = [result['url'] for result in response.json()['web']['results']]
+        return urls
     else:
         return f"Error: please tell us that our search engine is down."
 

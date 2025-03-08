@@ -3,7 +3,8 @@ import logging
 import os
 import requests
 from typing import Dict, Any
-from src.process import process_results
+from src.process import process_results, process_url
+from src.post_process import post_process
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -23,23 +24,28 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         logger.info(f"Received event: {json.dumps(event)}")
         query_params = event.get('queryStringParameters', {})
         search_query = query_params.get('q', '')
+        url = query_params.get('url', '')
         
-        if not search_query:
+        if not search_query and not url:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Search query parameter "q" is required'})
+                'body': json.dumps({'error': 'Either search query parameter "q" or "url" is required'})
             }
-        
 
-        processed_results = process_results(search_query)
-        logger.info(f"Successfully processed search query: {search_query}")
+        if url:
+            processed_results = process_url(url)
+            logger.info(f"Successfully processed URL: {url}")
+        else:
+            processed_results = process_results(search_query)
+            logger.info(f"Successfully processed search query: {search_query}")
+
         return {
             'statusCode': 200,
             'headers': {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': processed_results
+            'body': json.dumps(processed_results)
         }
         
     except requests.exceptions.RequestException as e:
