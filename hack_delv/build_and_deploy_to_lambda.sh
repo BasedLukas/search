@@ -3,18 +3,33 @@
 
 set -e  # Exit immediately if a command exits with a non-zero status
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    echo "Loading environment variables from .env file"
+    export $(cat .env | grep -v '^#' | xargs)
+else
+    echo "Error: .env file not found"
+    echo "Please create a .env file with BRAVE_API_KEY and GROQ_API_KEY"
+    exit 1
+fi# Check if required API keys are set
+if [ -z "$BRAVE_API_KEY" ]; then
+    echo "Error: BRAVE_API_KEY environment variable is not set"
+    echo "Please set it with: export BRAVE_API_KEY=your-api-key-here"
+    exit 1
+fi
+if [ -z "$GROQ_API_KEY" ]; then
+    echo "Error: GROQ_API_KEY environment variable is not set"
+    echo "Please set it with: export GROQ_API_KEY=your-api-key-here"
+    exit 1
+fi
+
 # Configuration
 ECR_REPO="000000000000.dkr.ecr.us-east-1.amazonaws.com/getdelv"
 AWS_REGION="us-east-1"
 IMAGE_TAG="latest"
 BUILD_TAG="lambda-build"  # Temporary tag for local use
 
-# Check if BRAVE_API_KEY is set
-if [ -z "$BRAVE_API_KEY" ]; then
-    echo "Error: BRAVE_API_KEY environment variable is not set"
-    echo "Please set it with: export BRAVE_API_KEY=your-api-key-here"
-    exit 1
-fi
+
 
 echo "=== Setting up Docker buildx ==="
 # Remove existing builder if exists
@@ -29,6 +44,7 @@ echo "=== Building container for amd64 architecture ==="
 docker buildx build \
   --platform=linux/amd64 \
   --build-arg BRAVE_API_KEY=$BRAVE_API_KEY \
+  --build-arg GROQ_API_KEY=$GROQ_API_KEY \
   -t $BUILD_TAG \
   --load .
 

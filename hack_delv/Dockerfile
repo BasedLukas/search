@@ -6,9 +6,11 @@ ENV LAMBDA_TASK_ROOT=/var/task
 # Copy project files first
 COPY . ${LAMBDA_TASK_ROOT}/
 
-# Set up API key
+# Set up API keys
 ARG BRAVE_API_KEY
+ARG GROQ_API_KEY
 ENV BRAVE_API_KEY=${BRAVE_API_KEY}
+ENV GROQ_API_KEY=${GROQ_API_KEY}
 
 # Install dependencies
 RUN pip install -e .
