@@ -11,7 +11,8 @@ else
     echo "Error: .env file not found"
     echo "Please create a .env file with BRAVE_API_KEY and GROQ_API_KEY"
     exit 1
-fi# Check if required API keys are set
+fi
+# Check if required API keys are set
 if [ -z "$BRAVE_API_KEY" ]; then
     echo "Error: BRAVE_API_KEY environment variable is not set"
     echo "Please set it with: export BRAVE_API_KEY=your-api-key-here"

@@ -2,32 +2,50 @@ import requests
 from typing import Any, Dict
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
+API_ENDPOINT = "https://example.invalid"
 MY_API_KEY = os.getenv("MY_API_KEY")
 
 
-def fetch_data(search_term: str) -> requests.Response:
+def fetch_data(payload: Dict[str, str]) -> requests.Response:
     """
-    Sends a GET request to the specified API endpoint with the given search term.
-    
+    Sends a POST request to the specified API endpoint with the given payload inside a "body" key.
+
     Args:
-        search_term (str): The search term to include in the query parameter.
-        
+        payload (Dict[str, str]): The data containing either "query" or "url" inside the request body.
+
     Returns:
         requests.Response: The HTTP response from the API.
     """
-    url: str = "https://example.invalid"
-    params: Dict[str, str] = {"q": search_term}
-    headers: Dict[str, str] = {"x-api-key": MY_API_KEY}
-    
-    response: requests.Response = requests.get(url, params=params, headers=headers)
+    headers: Dict[str, str] = {
+        "x-api-key": MY_API_KEY,
+        "Content-Type": "application/json"
+    }
+    data: Dict[str, Any] = {
+        "body": json.dumps(payload)  # The API expects the "body" key to contain a JSON string
+    }
+
+    response: requests.Response = requests.post(API_ENDPOINT, json=data, headers=headers)
     return response
 
+
 if __name__ == "__main__":
-    term: str = "Converting a sympy polynomial into a list of coefficients"
-    response: requests.Response = fetch_data(term)
-    
-    print("Status Code:", response.status_code)
-    print("Response Data:", response.text)
+    # First call: using "query"
+    query_term: str = "Converting a sympy polynomial into a list of coefficients"
+    response_query: requests.Response = fetch_data({"query": query_term})
+
+    print("Query Request:")
+    print("Status Code:", response_query.status_code)
+    print("Response Data:", response_query.text)
+    print("-" * 50)
+
+    # Second call: using "url"
+    valid_url: str = "https://example.com/"
+    response_url: requests.Response = fetch_data({"url": valid_url})
+
+    print("URL Request:")
+    print("Status Code:", response_url.status_code)
+    print("Response Data:", response_url.text)
