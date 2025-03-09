@@ -19,3 +19,12 @@ def search_delv(search_query: str) -> str:
     return response.text
 
 
+def get_url_content(url: str) -> str:
+    """
+    Get the content of a URL.
+    """
+    headers = {
+        "x-api-key": os.getenv("API_KEY")
+    }
+    response = requests.get(API_ENDPOINT, params={"url": url}, headers=headers)
+    return response.text
