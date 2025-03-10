@@ -224,6 +224,17 @@ code {
     margin-bottom: 1.5rem;
 }
 
+/* Card Fix - Add these styles */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card .button-container {
+    margin-top: auto;
+}
+
 /* Info cards */
 .info-card {
     padding: 1.5rem;
