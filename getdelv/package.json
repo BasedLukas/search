@@ -1,0 +1,29 @@
+{
+  "name": "getdelv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://example.invalid"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://example.invalid"
+  },
+  "homepage": "https://example.invalid",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.0.6",
+    "vite": "^6.2.1",
+    "vite-plugin-html-minifier": "^1.0.5"
+  }
+}
