@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSearch API</title>
+    <style>
+/* Base styles */
+:root {
+    --bg-color: #fbf6e9;
+    --content-bg: #f2ecd9;
+    --text-color: #2c2c2c;
+    --border-color: #444;
+    --shadow-color: #333;
+    --border-radius: 4px;
+    --font-mono: 'Menlo', 'Monaco', 'Courier New', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 40px 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6, p, pre, code {
+    font-family: var(--font-mono);
+}
+
+h1, h2, h3 {
+    margin-bottom: 1rem;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    font-weight: normal;
+    margin: 2rem 0 1rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+/* Button styles */
+.button-container {
+    margin: 2rem 0;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    background-color: var(--content-bg);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    /* Shadow effect */
+    box-shadow: 3px 3px 0 var(--shadow-color);
+    transition: all 0.1s ease;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+}
+
+.btn.primary {
+    font-weight: normal;
+}
+
+.btn.secondary {
+    background-color: transparent;
+}
+
+.btn.small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Section styling */
+.section {
+    margin-bottom: 3rem;
+}
+
+.section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section h3 {
+    font-size: 1.3rem;
+    margin: 1.5rem 0 1rem;
+}
+
+/* Step containers */
+.step-container {
+    margin-bottom: 1.5rem;
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--content-bg);
+    border: 2px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0.3rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.copy-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Code blocks */
+.code-block {
+    background-color: var(--content-bg);
+    border: 2px solid var(--border-color);
+    border-top: none;
+    padding: 1rem;
+    overflow-x: auto;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.code-block pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+code {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.3rem;
+    border-radius: 3px;
+}
+
+/* Content boxes */
+.content-box {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--content-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+/* Info cards */
+.info-card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--content-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.info-card pre {
+    margin-top: 1rem;
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+}
+
+/* Note and warning boxes */
+.note-box, .warning-box {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.note-box {
+    background-color: #e8f4f8;
+}
+
+.warning-box {
+    background-color: #fff8e1;
+}
+
+.note-box h4, .warning-box h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+/* Form elements */
+.input-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.input-group label {
+    display: inline-block;
+    width: 170px;
+    margin-right: 15px;
+    font-size: 1.1rem;
+}
+
+input[type="text"], 
+input[type="password"], 
+input[type="email"],
+input[type="number"], 
+input[type="search"], 
+select, 
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    background-color: #fff;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+input:focus, 
+textarea:focus, 
+select:focus {
+    outline: none;
+    border-color: #000;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+/* Navigation */
+.nav-bar {
+    display: flex;
+    margin-bottom: 2rem;
+    background-color: var(--content-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+    overflow: hidden;
+}
+
+.nav-item {
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: normal;
+    border-right: 2px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.nav-item:last-child {
+    border-right: none;
+}
+
+.nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.nav-item.active {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+
+/* Footer styling */
+footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    background-color: var(--content-bg);
+    border-top: 2px solid var(--border-color);
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.footer-links {
+    margin-top: 1rem;
+}
+
+.footer-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin: 0 1rem;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* Feature grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.feature-card {
+    padding: 1.5rem;
+    background-color: var(--content-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.hero-section {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .input-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .input-group label {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-bar {
+        flex-direction: column;
+    }
+    
+    .nav-item {
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    .nav-item:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .hero-section {
+        min-height: auto;
+        padding: 3rem 0;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero-section">
+            <h1 class="main-title">CodeSearch API</h1>
+            <p class="subtitle">A specialized search engine designed for coding queries, built specifically for LLMs</p>
+            
+            <div class="content-box">
+                <p>CodeSearch API is a powerful search engine optimized for programming-related queries. Our API provides LLMs with precise, contextually relevant coding information from documentation, GitHub issues, Stack Overflow, and technical blogs - all in a format that's optimized for LLM consumption.</p>
+                <p>Stop hallucinating code solutions. Get accurate, up-to-date programming information through our specialized search API.</p>
+            </div>
+            
+            <div class="button-container">
+                <a href="#features" class="btn primary">Learn More</a>
+                <a href="#api-docs" class="btn secondary">API Documentation</a>
+            </div>
+        </header>
+
+        <section id="features" class="section">
+            <h2>Why Choose CodeSearch API?</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Built for LLMs</h3>
+                    <p>Our search results are specifically formatted to be easily consumed by large language models, improving their coding assistance capabilities.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Specialized for Code</h3>
+                    <p>Unlike general search engines, we focus exclusively on programming resources, providing more relevant results for technical queries.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Rich Context</h3>
+                    <p>Results include code snippets, documentation excerpts, and relevant discussions - all the context LLMs need to provide accurate answers.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>How It Works</h2>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>1. Send your coding query to our API</span>
+                </div>
+                <div class="code-block">
+                    <pre><code>POST https://example.invalid
+Content-Type: application/json
+
+{
+  "query": "how to handle pagination in flask sqlalchemy",
+  "max_results": 5
+}</code></pre>
+                </div>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>2. Receive structured, LLM-friendly results</span>
+                </div>
+                <div class="code-block">
+                    <pre><code>{
+  "results": [
+    {
+      "source": "Flask-SQLAlchemy Documentation",
+      "url": "https://example.invalid",
+      "content": "Flask-SQLAlchemy provides a paginate() method...",
+      "code_snippets": [
+        "query = User.query.paginate(page=page, per_page=per_page)"
+      ]
+    },
+    // More results...
+  ]
+}</code></pre>
+                </div>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>3. Feed these results to your LLM</span>
+                </div>
+                <div class="code-block">
+                    <pre><code>// In your application
+const searchResults = await codeSearchAPI.search("how to handle pagination in flask sqlalchemy");
+const llmPrompt = `Answer this coding question using the following information: ${JSON.stringify(searchResults)}`;
+const llmResponse = await llmAPI.complete(llmPrompt);</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="use-cases" class="section">
+            <h2>Use Cases</h2>
+            
+            <div class="content-box">
+                <h3>Enhancing AI Coding Assistants</h3>
+                <p>Integrate with your existing LLM-powered coding assistants to drastically reduce hallucinations and provide more accurate coding guidance.</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>Developer Tools</h3>
+                <p>Build specialized search capabilities into IDEs, documentation browsers, and other developer tools.</p>
+            </div>
+            
+            <div class="content-box">
+                <h3>Technical Support Chatbots</h3>
+                <p>Create support chatbots that can accurately address programming questions by pulling in relevant documentation.</p>
+            </div>
+        </section>
+
+        <section id="api-docs" class="section">
+            <h2>API Documentation</h2>
+            
+            <div class="note-box">
+                <h4>Note:</h4>
+                <p>Our full API documentation is coming soon. Contact us for early access and integration support.</p>
+            </div>
+            
+            <h3>Basic Endpoints</h3>
+            <div class="info-card">
+                <h3>GET /search</h3>
+                <p>Simple search query with text parameters</p>
+                <pre>?query=your+search+query&max_results=5&sources=github,stackoverflow</pre>
+            </div>
+            
+            <div class="info-card">
+                <h3>POST /search</h3>
+                <p>Advanced search with JSON payload</p>
+                <pre>{
+  "query": "your search query",
+  "max_results": 5,
+  "filters": {
+    "language": ["python", "javascript"],
+    "sources": ["github", "stackoverflow", "documentation"],
+    "max_age_days": 365
+  }
+}</pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Get Started</h2>
+            
+            <div class="warning-box">
+                <h4>Coming Soon:</h4>
+                <p>We're currently in private beta. Sign up to be notified when we launch!</p>
+            </div>
+            
+            <div class="content-box">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="contact@example.invalid">
+                </div>
+                <button class="btn primary">Join the Waitlist</button>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 CodeSearch API. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="mailto:contact@example.invalid">contact@example.invalid</a>
+                <a href="https://example.invalid">GitHub</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple form submission handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailForm = document.querySelector('.content-box button');
+            if (emailForm) {
+                emailForm.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('email').value;
+                    if (email) {
+                        alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
+                        document.getElementById('email').value = '';
+                    } else {
+                        alert('Please enter a valid email address.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
