@@ -169,10 +169,20 @@ p {
     border-top-left-radius: var(--border-radius);
     border-top-right-radius: var(--border-radius);
     box-shadow: 3px 3px 0 var(--shadow-color);
+    min-height: 44px;
+    gap: 1rem;
+}
+
+.step-header span {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex: 1;
+    min-width: 0;  /* Allows text to wrap properly */
 }
 
 .copy-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.3rem;
     background: transparent;
@@ -182,6 +192,9 @@ p {
     font-family: var(--font-mono);
     font-size: 0.9rem;
     cursor: pointer;
+    height: fit-content;
+    margin: auto 0;
+    flex-shrink: 0;  /* Prevents button from shrinking */
 }
 
 .copy-btn:hover {
@@ -421,13 +434,18 @@ select {
     }
     
     .step-header {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: flex-start;
+        flex-direction: row;
+        padding: 0.5rem 1rem;
+        min-height: 36px;
+    }
+    
+    .step-header span {
+        font-size: 0.9rem;
     }
     
     .copy-btn {
-        align-self: flex-end;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
     }
 }
 
