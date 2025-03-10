@@ -20,22 +20,22 @@
 <body>
     <div class="container">
         <header>
-            <h1 class="main-title">getdelv</h1>
+            <h1 class="main-title">getdelv🔎</h1>
             <p class="subtitle">The coding search engine built specifically for LLMs</p>
             
             <div class="cta-container">
-                <a href="#early-access" class="btn primary">Get Early Access</a>
-                <a href="#how-it-works" class="btn secondary">See How It Works</a>
+                <a href="https://example.invalid" class="btn primary">Get Early Access</a>
+                <a href="#how-it-works" class="btn primary">See How It Works</a>
             </div>
         </header>
 
         <section class="section">
             <h2>Supercharge Your LLM's Coding Knowledge</h2>
             <div class="content-box">
-                <p>getdelv is a queryable data source for LLMs that generate code. The LLM queries the delv database for documentation that may have changed recently or that is too obscure to be retained in its weights. Our aim is to be the link between disparate data sources and the LLM.</p>
-                <p>A limited MVP will be out in mid March to a small group of testers, with a public launch planned for May 2025.</p>
+                <p>getdelv provides up-to-date programming documentation and reference materials in plain text format, specifically for LLMs generating code. Instead of returning lists of links like traditional search engines, we deliver ready-to-use contextual information that helps LLMs produce better code, especially for recent updates or specialized libraries. </p>
+                <p>Limited beta access now open.</p>
                 <div class="button-container">
-                    <a href="#early-access" class="btn primary">Join Beta Testing</a>
+                    <a href="https://example.invalid" class="btn primary">Join Beta Testing</a>
                 </div>
             </div>
         </section>
@@ -43,17 +43,13 @@
         <section class="section">
             <h2>Why getdelv?</h2>
             
-            <div class="info-card">
+            <div class="content-box">
                 <h3>What makes us different:</h3>
                 <ul>
-                    <li>We only index coding related webpages, so it's faster and cheaper to run, and more capable.</li>
-                    <li>It returns a paragraph or two of text that can be directly inserted into the model context, as opposed to a list of links.</li>
-                    <li>SaaS companies with complex APIs can upload documentation and code snippets to our database, making it easier to integrate their products.</li>
-                    <li>It can be tuned to work with a specific tech stack or problem domain, which reduces noise and improves quality.</li>
+                    <li>We focus exclusively on coding-related information, curated with care to deliver high-quality, relevant results.</li>
+                    <li>Our search returns short text snippets ready for immediate use by LLMs, not just links that require additional processing</li>
+                    <li>We work with you to fine-tune our search for your specific tech stack and requirements, ensuring you get precisely the information your projects need.</li>
                 </ul>
-                <div class="button-container">
-                    <a href="#contact" class="btn secondary">Learn More</a>
-                </div>
             </div>
         </section>
 
@@ -69,8 +65,7 @@
                     <span>1. LLM encounters documentation gap</span>
                 </div>
                 <div class="code-block">
-                    <pre><code># LLM tries to use an obscure API feature
-# but lacks up-to-date documentation</code></pre>
+                    <pre><code># LLM tries to use an obscure API, but lacks up-to-date documentation</code></pre>
                 </div>
             </div>
             
@@ -80,9 +75,8 @@
                 </div>
                 <div class="code-block">
                     <pre><code>response = getdelv.search(
-    query="snowflake python connector authentication options",
+    query="snowpark 1.0.4 snowflake.core Root Account creation syntax python",
     tech_stack=["python", "snowflake"],
-    format="plain_text",
     max_length=500
 )</code></pre>
                 </div>
@@ -94,12 +88,15 @@
                 </div>
                 <div class="code-block">
                     <pre><code># LLM receives concise, accurate documentation text:
-"The Snowflake Python connector supports several authentication methods:
-1. Username/password
-2. Key pair authentication 
-3. OAuth
-4. Okta authentication
-For key pair auth, you'll need to..."</code></pre>
+
+"""snowflake.core.account.Account
+class snowflake.core.account.Account(
+    name: str, 
+    edition: str, 
+    admin_name: str, 
+    email: str, 
+    organization_name: str | None = None,
+..."""</code></pre>
                 </div>
             </div>
             
@@ -113,33 +110,29 @@ For key pair auth, you'll need to..."</code></pre>
                 </div>
             </div>
             
-            <div class="button-container">
-                <a href="#early-access" class="btn primary">Try It Now</a>
-            </div>
         </section>
 
         <section class="section">
             <h2>Why LLMs Need Better Documentation Access</h2>
             
-            <div class="note-box">
+            <div class="content-box">
                 <h4>Current AI coding systems face these limitations:</h4>
                 <ul>
-                    <li>Models are very large and expensive to run because they store data in their weights</li>
+                    <li>Smaller models haven't memorized enough coding information, requiring you to use larger, more expensive models</li>
+                    <li>Obscure information isn't retained even by the biggest models</li>
                     <li>API references, bug reports, and documentation change daily, making models quickly outdated</li>
-                    <li>Obscure information isn't retained in training even by the biggest models</li>
                 </ul>
             </div>
             
-            <div class="warning-box">
+            <div class="content-box">
                 <h4>Existing search engines don't solve this problem because:</h4>
                 <ul>
                     <li>Additional tooling is required to make them integrate well with applications/agents such as MCP servers</li>
                     <li>They prioritize user-friendly websites with ads over information-dense results</li>
                     <li>They return long lists of links rather than the concise paragraphs of text that models need</li>
-                    <li>They're expensive and slow because they index the entire internet</li>
                 </ul>
                 <div class="button-container">
-                    <a href="#early-access" class="btn primary">Solve These Problems Now</a>
+                    <a href="https://example.invalid" class="btn primary">Solve These Problems Now</a>
                 </div>
             </div>
         </section>
@@ -162,9 +155,9 @@ For key pair auth, you'll need to..."</code></pre>
 
 # When your LLM needs documentation
 response = getdelv.search(
-    query="react useEffect cleanup function",
-    tech_stack=["javascript", "react"],
-    format="plain_text"
+    query="snowpark 1.0.4 snowflake.core Root Account creation syntax python",
+    tech_stack=["python", "snowflake"],
+    max_length=500
 )
 
 # Use the response in your LLM context
@@ -185,23 +178,16 @@ print(response.text)</code></pre>
                 <div class="code-block">
                     <pre><code># Register getdelv as a tool in your MCP configuration
 {
-  "tools": [
-    {
-      "name": "getdelv",
-      "description": "Search for coding documentation",
-      "parameters": {
-        "query": "string",
-        "tech_stack": "array",
-        "format": "string"
-      }
+    "mcpServers": {
+        "getdelv": {
+        "command": "path/to/your/python/interpreter",
+        "args": [
+            "/path/to/project"
+            ]
+        }
     }
-  ]
 }</code></pre>
                 </div>
-            </div>
-            
-            <div class="button-container">
-                <a href="#contact" class="btn primary">Get Implementation Help</a>
             </div>
         </section>
 
@@ -209,27 +195,27 @@ print(response.text)</code></pre>
             <h2>Perfect For</h2>
             
             <div class="cards-container">
-                <div class="info-card">
+                <div class="content-box card">
                     <h3>AI Coding Assistants</h3>
-                    <p>Enhance tools like GitHub Copilot, Cursor, Tabnine, and Codeium with up-to-date documentation.</p>
+                    <p>Enhance tools like Cursor and Claude desktop with up-to-date documentation.</p>
                     <div class="button-container">
-                        <a href="#early-access" class="btn small secondary">Learn More</a>
+                        <a href="https://example.invalid" class="btn primary">Learn More</a>
                     </div>
                 </div>
                 
-                <div class="info-card">
-                    <h3>Development Platforms</h3>
-                    <p>Power AI features in platforms like Replit and Lovable with accurate coding knowledge.</p>
+                <div class="content-box card">
+                    <h3>Code generation platforms</h3>
+                    <p>Improve LLM code generation in your own platforms with accurate coding knowledge.</p>
                     <div class="button-container">
-                        <a href="#early-access" class="btn small secondary">Learn More</a>
+                        <a href="https://example.invalid" class="btn primary">Learn More</a>
                     </div>
                 </div>
                 
-                <div class="info-card">
+                <div class="content-box card">
                     <h3>Internal Dev Tools</h3>
                     <p>Improve your company's custom AI development solutions with specialized search capabilities.</p>
                     <div class="button-container">
-                        <a href="#early-access" class="btn small secondary">Learn More</a>
+                        <a href="https://example.invalid" class="btn primary">Learn More</a>
                     </div>
                 </div>
             </div>
@@ -240,40 +226,11 @@ print(response.text)</code></pre>
             <div class="content-box">
                 <ul>
                     <li>Make your product more accessible to AI tools</li>
-                    <li>Upload your documentation to our database</li>
-                    <li>Custom integrations available</li>
                     <li>Ensure your customers can easily use your services with AI coding assistants</li>
+                    <li>Create a specialized endpoint for your users</li>
                 </ul>
                 <div class="button-container">
-                    <a href="#contact" class="btn primary">Partner With Us</a>
-                </div>
-            </div>
-        </section>
-        
-        <section id="early-access" class="section">
-            <h2>Get Started with getdelv</h2>
-            
-            <div class="form-container">
-                <div class="input-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter your email for early access">
-                </div>
-                
-                <div class="input-group">
-                    <label for="use-case">How will you use getdelv?</label>
-                    <select id="use-case">
-                        <option value="" disabled selected>Choose an option</option>
-                        <option value="ai-coding">AI Coding Assistant</option>
-                        <option value="development">Development Platform</option>
-                        <option value="internal">Internal Developer Tools</option>
-                        <option value="saas">SaaS Provider</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="button-container">
-                    <a href="#" class="btn primary">Request API Access</a>
-                    <a href="#contact" class="btn secondary">Contact Sales</a>
+                    <a href="https://example.invalid" class="btn primary">Partner With Us</a>
                 </div>
             </div>
         </section>
@@ -281,20 +238,13 @@ print(response.text)</code></pre>
         <section id="contact" class="section">
             <h2>Contact Us</h2>
             <div class="content-box">
-                <p>Email: <a href="mailto:contact@example.invalid">contact@example.invalid</a></p>
                 <div class="button-container">
                     <a href="mailto:contact@example.invalid" class="btn primary">Email Us</a>
-                    <a href="#early-access" class="btn secondary">Request Demo</a>
+                    <a href="https://example.invalid" class="btn primary">Request Demo</a>
                 </div>
             </div>
         </section>
         
-        <nav class="nav-bar">
-            <a href="#" class="nav-item active">Home</a>
-            <a href="#how-it-works" class="nav-item">How It Works</a>
-            <a href="#early-access" class="nav-item">Early Access</a>
-            <a href="#contact" class="nav-item">Contact</a>
-        </nav>
     </div>
     <script type="module" src="./js/main.js"></script>
 </body>
