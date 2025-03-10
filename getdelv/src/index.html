@@ -3,177 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design System</title>
+    <meta name="description" content="getdelv - The coding search engine built specifically for LLMs to enhance AI coding assistants with up-to-date documentation">
+    <meta name="keywords" content="LLM, coding, search engine, documentation, AI coding, API, developer tools">
+    <meta name="author" content="getdelv">
+    <meta property="og:title" content="getdelv - Coding Search Engine for LLMs">
+    <meta property="og:description" content="Supercharge your LLM's coding knowledge with accurate, up-to-date documentation">
+    <meta property="og:image" content="./images/getdelv-logo.png">
+    <meta property="og:url" content="https://getdelv.com">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <title>getdelv - Coding Search Engine for LLMs</title>
     <link rel="stylesheet" href="./styles/main.css">
+    <link rel="icon" href="./images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="./images/apple-touch-icon.png">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1 class="main-title">speech_to_text</h1>
-            <p class="subtitle">A lightweight, efficient speech-to-text system based on OpenAI Whisper model</p>
+            <h1 class="main-title">getdelv</h1>
+            <p class="subtitle">The coding search engine built specifically for LLMs</p>
             
-            <div class="button-container">
-                <a href="#" class="btn primary">Get Started</a>
+            <div class="cta-container">
+                <a href="#early-access" class="btn primary">Get Early Access</a>
+                <a href="#how-it-works" class="btn secondary">See How It Works</a>
             </div>
         </header>
 
         <section class="section">
-            <h2>Quick Start Guide</h2>
-            
-            <div class="step-container">
-                <div class="step-header">
-                    <span>1. Clone the Repository</span>
-                    <button class="copy-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="code-block">
-                    <pre><code>git clone https://example.invalid
-cd speech_to_text</code></pre>
-                </div>
-            </div>
-            
-            <div class="step-container">
-                <div class="step-header">
-                    <span>2. Create and Set Up the Virtual Environment</span>
-                    <button class="copy-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="code-block">
-                    <pre><code>python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt</code></pre>
-                </div>
-            </div>
-            
-            <div class="step-container">
-                <div class="step-header">
-                    <span>3. Run the Application</span>
-                    <button class="copy-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="code-block">
-                    <pre><code>python main.py</code></pre>
+            <h2>Supercharge Your LLM's Coding Knowledge</h2>
+            <div class="content-box">
+                <p>getdelv is a queryable data source for LLMs that generate code. The LLM queries the delv database for documentation that may have changed recently or that is too obscure to be retained in its weights. Our aim is to be the link between disparate data sources and the LLM.</p>
+                <p>A limited MVP will be out in mid March to a small group of testers, with a public launch planned for May 2025.</p>
+                <div class="button-container">
+                    <a href="#early-access" class="btn primary">Join Beta Testing</a>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>Typography Examples</h2>
-            <div class="content-box">
-                <h1>Heading 1</h1>
-                <h2>Heading 2</h2>
-                <h3>Heading 3</h3>
-                <p>This is regular paragraph text. The monospace font provides a clean, technical look that matches the coding aesthetic.</p>
-                <p><strong>Bold text</strong> for emphasis and <code>inline code</code> formatting.</p>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>UI Elements</h2>
-            
-            <h3>Buttons</h3>
-            <div class="content-box">
-                <button class="btn primary">Primary Button</button>
-                <button class="btn secondary">Secondary Button</button>
-                <button class="btn small">Small Button</button>
-                
-                <div class="button-group">
-                    <button class="btn icon-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 12L3 7H13L8 12Z" fill="currentColor"/>
-                        </svg>
-                        Download
-                    </button>
-                </div>
-            </div>
-            
-            <h3>Form Elements</h3>
-            <div class="content-box">
-                <div class="input-group">
-                    <label for="text-input">Text Input</label>
-                    <input type="text" id="text-input" placeholder="Enter text here">
-                </div>
-                
-                <div class="input-group">
-                    <label for="select">Select Option</label>
-                    <select id="select">
-                        <option value="" disabled selected>Choose an option</option>
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label for="textarea">Text Area</label>
-                    <textarea id="textarea" rows="4" placeholder="Enter longer text here"></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password">
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Info Cards</h2>
+            <h2>Why getdelv?</h2>
             
             <div class="info-card">
-                <h3>Repository: BasedLukas/speech_to_text</h3>
-                <p>Files analyzed: 10</p>
-                <p>Estimated tokens: 3.6k</p>
-            </div>
-            
-            <div class="info-card">
-                <h3>Directory structure:</h3>
-                <pre>├── basedlukas-speech_to_text/
-├── readme.md
-├── LICENSE
-├── install.sh
-├── main.py
-├── requirements.txt
-└── src/
-    ├── __init__.py
-    └── config.py</pre>
+                <h3>What makes us different:</h3>
+                <ul>
+                    <li>We only index coding related webpages, so it's faster and cheaper to run, and more capable.</li>
+                    <li>It returns a paragraph or two of text that can be directly inserted into the model context, as opposed to a list of links.</li>
+                    <li>SaaS companies with complex APIs can upload documentation and code snippets to our database, making it easier to integrate their products.</li>
+                    <li>It can be tuned to work with a specific tech stack or problem domain, which reduces noise and improves quality.</li>
+                </ul>
+                <div class="button-container">
+                    <a href="#contact" class="btn secondary">Learn More</a>
+                </div>
             </div>
         </section>
-        
+
+        <section id="how-it-works" class="section">
+            <h2>How It Works</h2>
+            
+            <div class="video-container">
+                <iframe width="100%" height="315" src="https://example.invalid" title="getdelv Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>1. LLM encounters documentation gap</span>
+                </div>
+                <div class="code-block">
+                    <pre><code># LLM tries to use an obscure API feature
+# but lacks up-to-date documentation</code></pre>
+                </div>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>2. LLM calls getdelv API</span>
+                </div>
+                <div class="code-block">
+                    <pre><code>response = getdelv.search(
+    query="snowflake python connector authentication options",
+    tech_stack=["python", "snowflake"],
+    format="plain_text",
+    max_length=500
+)</code></pre>
+                </div>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>3. getdelv returns relevant documentation</span>
+                </div>
+                <div class="code-block">
+                    <pre><code># LLM receives concise, accurate documentation text:
+"The Snowflake Python connector supports several authentication methods:
+1. Username/password
+2. Key pair authentication 
+3. OAuth
+4. Okta authentication
+For key pair auth, you'll need to..."</code></pre>
+                </div>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>4. LLM continues coding with accurate information</span>
+                </div>
+                <div class="code-block">
+                    <pre><code># LLM can now generate correct code using the
+# up-to-date documentation provided by getdelv</code></pre>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <a href="#early-access" class="btn primary">Try It Now</a>
+            </div>
+        </section>
+
         <section class="section">
-            <h2>Containers and Notes</h2>
+            <h2>Why LLMs Need Better Documentation Access</h2>
             
             <div class="note-box">
-                <h4>Note:</h4>
-                <p>This project requires Python 3.8 or higher and depends on the OpenAI Whisper library.</p>
+                <h4>Current AI coding systems face these limitations:</h4>
+                <ul>
+                    <li>Models are very large and expensive to run because they store data in their weights</li>
+                    <li>API references, bug reports, and documentation change daily, making models quickly outdated</li>
+                    <li>Obscure information isn't retained in training even by the biggest models</li>
+                </ul>
             </div>
             
             <div class="warning-box">
-                <h4>Warning:</h4>
-                <p>Processing large audio files may require significant memory resources.</p>
+                <h4>Existing search engines don't solve this problem because:</h4>
+                <ul>
+                    <li>Additional tooling is required to make them integrate well with applications/agents such as MCP servers</li>
+                    <li>They prioritize user-friendly websites with ads over information-dense results</li>
+                    <li>They return long lists of links rather than the concise paragraphs of text that models need</li>
+                    <li>They're expensive and slow because they index the entire internet</li>
+                </ul>
+                <div class="button-container">
+                    <a href="#early-access" class="btn primary">Solve These Problems Now</a>
+                </div>
             </div>
         </section>
         
         <section class="section">
-            <h2>Navigation</h2>
+            <h2>Integration Made Simple</h2>
             
-            <nav class="nav-bar">
-                <a href="#" class="nav-item active">Home</a>
-                <a href="#" class="nav-item">Documentation</a>
-                <a href="#" class="nav-item">Examples</a>
-                <a href="#" class="nav-item">GitHub</a>
-            </nav>
+            <div class="step-container">
+                <div class="step-header">
+                    <span>API Integration</span>
+                    <button class="copy-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <div class="code-block">
+                    <pre><code>import getdelv
+
+# When your LLM needs documentation
+response = getdelv.search(
+    query="react useEffect cleanup function",
+    tech_stack=["javascript", "react"],
+    format="plain_text"
+)
+
+# Use the response in your LLM context
+print(response.text)</code></pre>
+                </div>
+            </div>
+            
+            <div class="step-container">
+                <div class="step-header">
+                    <span>MCP Server Connection</span>
+                    <button class="copy-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <div class="code-block">
+                    <pre><code># Register getdelv as a tool in your MCP configuration
+{
+  "tools": [
+    {
+      "name": "getdelv",
+      "description": "Search for coding documentation",
+      "parameters": {
+        "query": "string",
+        "tech_stack": "array",
+        "format": "string"
+      }
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <a href="#contact" class="btn primary">Get Implementation Help</a>
+            </div>
         </section>
+
+        <section class="section">
+            <h2>Perfect For</h2>
+            
+            <div class="cards-container">
+                <div class="info-card">
+                    <h3>AI Coding Assistants</h3>
+                    <p>Enhance tools like GitHub Copilot, Cursor, Tabnine, and Codeium with up-to-date documentation.</p>
+                    <div class="button-container">
+                        <a href="#early-access" class="btn small secondary">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Development Platforms</h3>
+                    <p>Power AI features in platforms like Replit and Lovable with accurate coding knowledge.</p>
+                    <div class="button-container">
+                        <a href="#early-access" class="btn small secondary">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Internal Dev Tools</h3>
+                    <p>Improve your company's custom AI development solutions with specialized search capabilities.</p>
+                    <div class="button-container">
+                        <a href="#early-access" class="btn small secondary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>For SaaS Providers</h2>
+            <div class="content-box">
+                <ul>
+                    <li>Make your product more accessible to AI tools</li>
+                    <li>Upload your documentation to our database</li>
+                    <li>Custom integrations available</li>
+                    <li>Ensure your customers can easily use your services with AI coding assistants</li>
+                </ul>
+                <div class="button-container">
+                    <a href="#contact" class="btn primary">Partner With Us</a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="early-access" class="section">
+            <h2>Get Started with getdelv</h2>
+            
+            <div class="form-container">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email for early access">
+                </div>
+                
+                <div class="input-group">
+                    <label for="use-case">How will you use getdelv?</label>
+                    <select id="use-case">
+                        <option value="" disabled selected>Choose an option</option>
+                        <option value="ai-coding">AI Coding Assistant</option>
+                        <option value="development">Development Platform</option>
+                        <option value="internal">Internal Developer Tools</option>
+                        <option value="saas">SaaS Provider</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="button-container">
+                    <a href="#" class="btn primary">Request API Access</a>
+                    <a href="#contact" class="btn secondary">Contact Sales</a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="section">
+            <h2>Contact Us</h2>
+            <div class="content-box">
+                <p>Email: <a href="mailto:contact@example.invalid">contact@example.invalid</a></p>
+                <div class="button-container">
+                    <a href="mailto:contact@example.invalid" class="btn primary">Email Us</a>
+                    <a href="#early-access" class="btn secondary">Request Demo</a>
+                </div>
+            </div>
+        </section>
+        
+        <nav class="nav-bar">
+            <a href="#" class="nav-item active">Home</a>
+            <a href="#how-it-works" class="nav-item">How It Works</a>
+            <a href="#early-access" class="nav-item">Early Access</a>
+            <a href="#contact" class="nav-item">Contact</a>
+        </nav>
     </div>
     <script type="module" src="./js/main.js"></script>
 </body>
