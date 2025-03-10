@@ -23,7 +23,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    padding: 40px 0;
+    padding: 0;
 }
 
 .container {
@@ -31,6 +31,15 @@ body {
     margin: 0 auto;
     padding: 0 var(--container-padding);
     width: 100%;
+}
+
+/* First fold content */
+.first-fold-content {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
 }
 
 /* Typography */
@@ -224,7 +233,7 @@ code {
     margin-bottom: 1.5rem;
 }
 
-/* Card Fix - Add these styles */
+/* Card Fix */
 .card {
     display: flex;
     flex-direction: column;
