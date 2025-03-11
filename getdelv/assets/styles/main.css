@@ -195,6 +195,7 @@ p {
     height: fit-content;
     margin: auto 0;
     flex-shrink: 0;  /* Prevents button from shrinking */
+    color: var(--text-color);
 }
 
 .copy-btn:hover {
@@ -478,5 +479,82 @@ select {
     
     .nav-item:nth-last-child(-n+2) {
         border-bottom: none;
+    }
+}
+
+/* Flow path styling */
+.flow-container {
+    margin: 2rem 0;
+}
+
+.flow-box {
+    position: relative;
+    padding: 1.5rem 1.5rem 1.5rem 4rem;
+    margin-bottom: 2rem;
+    background-color: var(--box-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.flow-number {
+    position: absolute;
+    left: 1.5rem;
+    top: 1.5rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    font-weight: bold;
+    box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.flow-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+.flow-content p {
+    margin-bottom: 0;
+}
+
+.flow-arrow {
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    line-height: 1;
+    z-index: 1;
+    background-color: var(--bg-color);
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.flow-box:last-child .flow-arrow {
+    display: none;
+}
+
+/* Responsive adjustments for flow boxes */
+@media (max-width: 768px) {
+    .flow-box {
+        padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+    }
+    
+    .flow-number {
+        width: 1.8rem;
+        height: 1.8rem;
+        left: 1rem;
+        top: 1.2rem;
     }
 }
