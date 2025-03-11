@@ -182,14 +182,11 @@ p {
 }
 
 /* Base code styling - simplified */
+/* Code block styling - revised */
 .code-comparison {
     display: grid;
     gap: 1.5rem;
     margin-bottom: 2rem;
-  }
-  
-  .comparison-row {
-    width: 100%;
   }
   
   .code-block {
@@ -199,11 +196,6 @@ p {
     background-color: var(--content-bg);
     border: 2px solid var(--border-color);
     transition: transform 0.1s ease;
-  }
-  
-  .code-block:hover {
-    transform: translate(1px, 1px);
-    box-shadow: 2px 2px 0 var(--shadow-color);
   }
   
   .code-block__header {
@@ -219,29 +211,39 @@ p {
   }
   
   .code-block__content {
+    position: relative;
     padding: 1rem;
     background-color: rgba(0, 0, 0, 0.03);
     overflow-x: auto;
     border-left: 4px solid rgba(0, 0, 0, 0.1);
-    /* Fix for scrolling alignment */
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
   }
   
-  /* Important fix for scrolling position */
+  /* Critical fix for indentation issues */
   .code-block__content pre {
     margin: 0;
+    padding: 0;
     font-family: var(--font-mono);
     font-size: 0.95rem;
     line-height: 1.6;
+    /* Change to pre-line for better control */
     white-space: pre;
-    tab-size: 2;
   }
   
   .code-block__content code {
     background: transparent;
     color: var(--text-color);
+    /* This is crucial */
     display: block;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .code-block--error {
+    border-left: 4px solid #d04040;
+  }
+  
+  .code-block--success {
+    border-left: 4px solid #40a040;
   }
   
   /* Syntax highlighting token styles */
@@ -253,9 +255,7 @@ p {
   .token.function { color: #487896; }
   .token.punctuation { color: #666; }
   .token.property { color: #6a7280; }
-  .token.boolean { color: #8a558f; }
-  .token.null { color: #8a558f; }
-  
+    
   /* Color variants */
   .code-block--error {
     border-left: 4px solid #d04040;

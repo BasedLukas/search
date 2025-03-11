@@ -46,7 +46,7 @@
                             </div>
                             <div class="code-block__content">
                       <pre><code><span class="token comment">// Incorrect API from outdated knowledge</span>
-                      <span class="token function">snowflake</span><span class="token punctuation">.</span><span class="token function">connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<span class="token function">snowflake</span><span class="token punctuation">.</span><span class="token function">connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
                             </div>
                           </div>
                         </div>
@@ -54,12 +54,12 @@
                           <div class="code-block code-block--success">
                             <div class="code-block__header">
                               <span>With getdelv</span>
-                            </div>
-                            <div class="code-block__content">
-                      <pre><code><span class="token comment">// Current Snowpark API</span>
-                      <span class="token keyword">import</span> snowflake<span class="token punctuation">.</span>snowpark <span class="token keyword">as</span> snowpark
-                      session <span class="token operator">=</span> snowpark<span class="token punctuation">.</span>Session<span class="token punctuation">.</span>builder<span class="token punctuation">.</span><span class="token function">config</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-                            </div>
+    </div>
+    <div class="code-block__content">
+<pre><code><span class="token comment">// Current Snowpark API</span>
+<span class="token keyword">import</span> snowflake<span class="token punctuation">.</span>snowpark <span class="token keyword">as</span> snowpark
+session <span class="token operator">=</span> snowpark<span class="token punctuation">.</span>Session<span class="token punctuation">.</span>builder<span class="token punctuation">.</span><span class="token function">config</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+    </div>
                           </div>
                         </div>
                       </div>
@@ -178,24 +178,24 @@
             
             <div class="code-comparison">
                 <div class="comparison-row">
-                  <div class="code-block">
-                    <div class="code-block__header">
-                      <span>Python Code</span>
-                    </div>
-                    <div class="code-block__content">
-                      <pre><code><span class="token keyword">import</span> getdelv
-              
-              <span class="token comment"># When your LLM needs documentation</span>
-              response <span class="token operator">=</span> getdelv<span class="token punctuation">.</span><span class="token function">search</span><span class="token punctuation">(</span>
-                  query<span class="token operator">=</span><span class="token string">"snowpark 1.0.4 snowflake.core Root Account creation syntax python"</span>,
-                  tech_stack<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"python"</span>, <span class="token string">"snowflake"</span><span class="token punctuation">]</span>,
-                  max_length<span class="token operator">=</span><span class="token number">500</span>
-              <span class="token punctuation">)</span>
-              
-              <span class="token comment"># Use the response in your LLM context</span>
-              <span class="token function">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span></code></pre>
-                    </div>
-                  </div>
+<div class="code-block">
+  <div class="code-block__header">
+    <span>Python Code</span>
+  </div>
+  <div class="code-block__content">
+    <pre><code><span class="token keyword">import</span> getdelv
+
+<span class="token comment"># When your LLM needs documentation</span>
+response <span class="token operator">=</span> getdelv<span class="token punctuation">.</span><span class="token function">search</span><span class="token punctuation">(</span>
+    query<span class="token operator">=</span><span class="token string">"snowpark 1.0.4 snowflake.core Root Account creation syntax python"</span>,
+    tech_stack<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"python"</span>, <span class="token string">"snowflake"</span><span class="token punctuation">]</span>,
+    max_length<span class="token operator">=</span><span class="token number">500</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment"># Use the response in your LLM context</span>
+<span class="token function">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span></code></pre>
+  </div>
+</div>
                 </div>
                 <div class="comparison-row">
                   <div class="code-block">
@@ -203,16 +203,16 @@
                       <span>MCP Configuration</span>
                     </div>
                     <div class="code-block__content">
-                      <pre><code><span class="token punctuation">{</span>
-                <span class="token property">"mcpServers"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-                  <span class="token property">"getdelv"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-                    <span class="token property">"command"</span><span class="token operator">:</span> <span class="token string">"path/to/your/python/interpreter"</span>,
-                    <span class="token property">"args"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-                      <span class="token string">"/path/to/project"</span>
-                    <span class="token punctuation">]</span>
-                  <span class="token punctuation">}</span>
-                <span class="token punctuation">}</span>
-              <span class="token punctuation">}</span></code></pre>
+    <pre><code><span class="token punctuation">{</span>
+    <span class="token property">"mcpServers"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"getdelv"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"command"</span><span class="token operator">:</span> <span class="token string">"path/to/your/python/interpreter"</span>,
+        <span class="token property">"args"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token string">"/path/to/project"</span>
+            <span class="token punctuation">]</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
                     </div>
                   </div>
                 </div>
