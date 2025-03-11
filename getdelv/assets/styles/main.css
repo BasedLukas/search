@@ -558,3 +558,111 @@ select {
         top: 1.2rem;
     }
 }
+/* Comparison styling */
+.comparison-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.comparison-box {
+    flex: 1;
+    background-color: var(--box-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.comparison-header {
+    padding: 1rem;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comparison-header h3 {
+    margin: 0;
+}
+
+.comparison-icon {
+    font-size: 1.5rem;
+}
+
+.comparison-list {
+    list-style: none;
+    padding: 1.5rem;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.comparison-list li {
+    position: relative;
+    padding-left: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.comparison-list li:last-child {
+    margin-bottom: 0;
+}
+
+.comparison-list.negative li:before {
+    content: "✗";
+    position: absolute;
+    left: 0;
+    color: #d04040;
+}
+
+.comparison-list.positive li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #40a040;
+}
+
+.comparison-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    z-index: 1;
+}
+
+.comparison-separator span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--button-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    font-weight: bold;
+    box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.highlight-box {
+    border-left: 4px solid var(--button-bg);
+}
+
+/* Responsive adjustments for comparison */
+@media (max-width: 768px) {
+    .comparison-container {
+        flex-direction: column;
+    }
+    
+    .comparison-separator {
+        width: 100%;
+        height: 30px;
+        margin: -15px 0;
+    }
+    
+    .comparison-separator span {
+        margin: 0 auto;
+    }
+}
