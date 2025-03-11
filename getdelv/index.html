@@ -23,29 +23,53 @@
 </head>
 <body>
     <div class="container">
+
         <!-- Hero Section -->
         <div class="first-fold-content">
             <header>
-                <h1 class="main-title">getdelv🔎</h1>
+                <h1 class="main-title">get<span class="delv-text">delv</span>🔎</h1>
                 <p class="subtitle">A search engine for AI coding agents</p>
-                
-
             </header>
-        
+
             <section class="section">
-                <h2>Empower Your LLM with Coding Knowledge</h2>
-                <div class="content-box">
-                    <p>getdelv provides up-to-date programming documentation in plain text format for LLMs. Instead of returning links like traditional search engines, we deliver ready-to-use contextual information that helps LLMs produce better code, especially for recent updates or specialized libraries.</p>
-                    <p>Limited beta access now open.</p>
-                    <div class="button-container">
-                        <a href="https://example.invalid" class="btn primary" aria-label="Join getdelv beta testing program">Join Beta Testing</a>
+                <div class="hero-container">
+                    <div class="hero-content-top">
+                        <h2>Better Code Through Better Context</h2>
+                        <p>getdelv delivers accurate, up-to-date programming documentation to AI coding agents, improving code quality and reducing errors.</p>
+                    </div>
+                    
+                    <div class="code-comparison">
+                        <div class="comparison-row">
+                            <div class="code-block code-block--error">
+                                <div class="code-block__header">
+                                    <span>Without getdelv</span>
+                                </div>
+                                <div class="code-block__content">
+                                    <pre><code>// Incorrect API from outdated knowledge
+                    snowflake.connect()</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comparison-row">
+                            <div class="code-block code-block--success">
+                                <div class="code-block__header">
+                                    <span>With getdelv</span>
+                                </div>
+                                <div class="code-block__content">
+                                    <pre><code>// Current Snowpark API
+                    import snowflake.snowpark as snowpark
+                    session = snowpark.Session.builder.config(...).create()</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cta-container">
+                        <a href="https://example.invalid" class="btn primary">Get Early Access</a>
+                        <a href="#how-it-works" class="btn secondary">See How It Works</a>
                     </div>
                 </div>
             </section>
-            <div class="cta-container">
-                <a href="https://example.invalid" class="btn primary" aria-label="Request early access to getdelv coding search engine">Get Early Access</a>
-                <a href="#how-it-works" class="btn primary">See How It Works</a>
-            </div>
         </div>
 
         <!-- Why Section -->
@@ -152,55 +176,49 @@
         <section class="section">
             <h2>Integration Made Simple</h2>
             
-            <div class="step-container">
-                <div class="step-header">
-                    <span>API Integration</span>
-                    <button class="copy-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-                <div class="code-block">
-                    <pre><code>import getdelv
-
-# When your LLM needs documentation
-response = getdelv.search(
-    query="snowpark 1.0.4 snowflake.core Root Account creation syntax python",
-    tech_stack=["python", "snowflake"],
-    max_length=500
-)
-
-# Use the response in your LLM context
-print(response.text)</code></pre>
-                </div>
-            </div>
+            <div class="code-comparison">
+                <div class="comparison-row">
+                    <div class="code-block">
+                        <div class="code-block__header">
+                            <span>Python Code</span>
+                        </div>
+                        <div class="code-block__content">
+                            <pre><code>import getdelv
             
-            <div class="step-container">
-                <div class="step-header">
-                    <span>MCP Server Connection</span>
-                    <button class="copy-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2H2V12H4V14H14V4H12V2ZM4 10V4H10V10H4ZM6 12V14H12V6H12.01V12H6Z" fill="currentColor"/>
-                        </svg>
-                        Copy
-                    </button>
+            # When your LLM needs documentation
+            response = getdelv.search(
+                query="snowpark 1.0.4 snowflake.core Root Account creation syntax python",
+                tech_stack=["python", "snowflake"],
+                max_length=500
+            )
+            
+            # Use the response in your LLM context
+            print(response.text)</code></pre>
+                        </div>
+                    </div>
                 </div>
-                <div class="code-block">
-                    <pre><code># Register getdelv as a tool in your MCP configuration
-{
-    "mcpServers": {
-        "getdelv": {
-        "command": "path/to/your/python/interpreter",
-        "args": [
-            "/path/to/project"
-            ]
-        }
-    }
-}</code></pre>
+                <div class="comparison-row">
+                    <div class="code-block">
+                        <div class="code-block__header">
+                            <span>MCP Configuration</span>
+                        </div>
+                        <div class="code-block__content">
+                            <pre><code>{
+              "mcpServers": {
+                "getdelv": {
+                  "command": "path/to/your/python/interpreter",
+                  "args": [
+                    "/path/to/project"
+                  ]
+                }
+              }
+            }</code></pre>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
         </section>
 
         <!-- Use Cases Section -->
