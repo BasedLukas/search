@@ -4,15 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>View HTML</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
   <div class="container">
-    <div class="back-link">
-      <a href="/">Back to Search</a>
-    </div>
-    <div class="html-content">
-      {{ html_content | safe }}
+    <div class="section">
+      <div class="button-container">
+        <a href="/" class="btn small">Back to Search</a>
+      </div>
+      
+      <div class="code-block">
+        <div class="code-block__header">
+          <span>HTML Content</span>
+        </div>
+        <div class="code-block__content">
+          {{ html_content | safe }}
+        </div>
+      </div>
     </div>
   </div>
 </body>
