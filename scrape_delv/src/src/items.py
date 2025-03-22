@@ -23,3 +23,11 @@ class WebpageItem(scrapy.Item):
     status_code = scrapy.Field()
     crawled_at = scrapy.Field()
     depth = scrapy.Field()
+
+class RepoFileItem(scrapy.Item):
+    file_content = scrapy.Field()
+    file_url = scrapy.Field()
+    repo_name = scrapy.Field()
+    file_extension = scrapy.Field()
+    file_path = scrapy.Field()
+    url = scrapy.Field()  # Will be the same as file_url, for compatibility with existing pipeline

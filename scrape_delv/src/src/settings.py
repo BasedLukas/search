@@ -72,6 +72,7 @@ DOWNLOAD_TIMEOUT = 15  # Timeout in seconds
 # src/settings.py
 ITEM_PIPELINES = {
    'src.pipelines.MongoDBPipeline': 300,
+   'src.pipelines.MongoDBRepoFilePipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -100,3 +101,4 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 DEPTH_LIMIT = 20
+
