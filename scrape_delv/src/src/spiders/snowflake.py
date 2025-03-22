@@ -29,7 +29,7 @@ class ToscrapeSpider(CrawlSpider):
         'LOG_LEVEL': 'INFO',
         'LOG_ENABLED': True,
         'LOG_FILE': 'snowflake.log',
-        # 'CLOSESPIDER_PAGECOUNT': 100,  # Limit page numbers
+        'CLOSESPIDER_PAGECOUNT': 10,  # Limit page numbers
         'ROBOTSTXT_OBEY': True,
     }
     

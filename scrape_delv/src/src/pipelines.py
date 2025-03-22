@@ -9,7 +9,7 @@ from pymongo import MongoClient
 from itemadapter import ItemAdapter
 
 class MongoDBPipeline:
-    collection_name = 'webpages'
+    collection_name = 'snowflake_test'
 
     def __init__(self, mongo_uri, mongo_db):
         self.mongo_uri = mongo_uri
@@ -19,7 +19,7 @@ class MongoDBPipeline:
     def from_crawler(cls, crawler):
         return cls(
             mongo_uri='mongodb://localhost:27017/',
-            mongo_db='scraping_db'
+            mongo_db='test_db'
         )
 
     def open_spider(self, spider):
