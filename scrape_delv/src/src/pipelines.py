@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 
-MONGODB_DATABASE = 'test_db'
+MONGODB_DATABASE = 'snowflake'
 MONGODB_COLLECTION_DOCS = 'docs'
 MONGODB_COLLECTION_GITHUB = 'github'
 

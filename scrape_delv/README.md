@@ -2,7 +2,7 @@
 docker run --name mongodb -d \
   -p 27017:27017 \
   -v /data/mongodb:/data/db \
-  --restart always \
+--restart unless-stopped \
   mongo
 docker ps | grep mongo
 
