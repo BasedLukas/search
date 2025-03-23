@@ -70,9 +70,10 @@ DOWNLOAD_TIMEOUT = 15  # Timeout in seconds
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 # src/settings.py
+# currently set for each scraper independantly
 ITEM_PIPELINES = {
-   'src.pipelines.MongoDBPipeline': 300,
-   'src.pipelines.MongoDBRepoFilePipeline': 300,
+   # 'src.pipelines.MongoDBPipeline': 300,
+   # 'src.pipelines.MongoDBRepoFilePipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -100,5 +101,5 @@ AUTOTHROTTLE_DEBUG = False
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
-DEPTH_LIMIT = 20
+DEPTH_LIMIT = 30
 

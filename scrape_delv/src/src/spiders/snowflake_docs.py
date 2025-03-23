@@ -3,11 +3,6 @@ from scrapy.linkextractors import LinkExtractor
 import logging
 from datetime import datetime
 
-# Configure logging to only show errors
-# logging.getLogger('scrapy').setLevel(logging.INFO)
-# logging.getLogger('pymongo').setLevel(logging.ERROR)
-
-
 class ToscrapeSpider(CrawlSpider):
     name = "snowflake_docs"
     allowed_domains = ["docs.snowflake.com"]
@@ -26,61 +21,84 @@ class ToscrapeSpider(CrawlSpider):
     
     # Configure Spider logging and crawl behavior
     custom_settings = {
-        'LOG_LEVEL': 'INFO',
+        'LOG_LEVEL': 'DEBUG',
         'LOG_ENABLED': True,
         'LOG_FILE': 'snowflake.log',
-        # 'CLOSESPIDER_PAGECOUNT': 10,  # Limit page numbers
+        'CLOSESPIDER_PAGECOUNT': 100,  # Limit page numbers
         'ROBOTSTXT_OBEY': True,
+    'ITEM_PIPELINES': {
+        'src.pipelines.MongoDBPipeline': 300,
+    }
     }
     
-
     def parse_item(self, response):
-        from src.items import WebpageItem  # Import your item class
+        """
+        Parse HTML response and extract document metadata.
+        
+        Args:
+            response: Scrapy response object
+            
+        Returns:
+            WebpageItem: Item containing extracted metadata
+        """
+        from src.items import WebpageItem
 
-        # Only accept text/html
+        # Skip non-HTML content
         content_type = response.headers.get('Content-Type', b'').decode('utf-8', errors='ignore')
         if 'text/html' not in content_type:
             return
 
-        # Extract metadata from head section
-        title = response.css('title::text').get() or ''
-        meta_description = response.css('meta[name="description"]::attr(content), meta[property="og:description"]::attr(content)').get() or ''
+        # Extract language carefully from various potential sources
+        lang = self._extract_language(response)
         
-        # Extract language from either <meta> or <html lang="...">
-        meta_language = response.css('meta[http-equiv="Content-Language"]::attr(content)').get() or ''
-        if not meta_language:
-            meta_language = response.css('html::attr(lang)').get() or ''  # Extract from <html lang="">
-
-        # Extract OpenGraph metadata
-        og_title = response.css('meta[property="og:title"]::attr(content), meta[name="og:title"]::attr(content)').get() or ''
-        og_description = response.css('meta[property="og:description"]::attr(content), meta[name="og:description"]::attr(content)').get() or ''
-        # Extract canonical URL
-        canonical_url = response.css('link[rel="canonical"]::attr(href)').get() or ''
-
-        # Extract HTTP headers
-        last_modified = response.headers.get('Last-Modified', b'').decode('utf-8', errors='ignore') or None
-        etag = response.headers.get('ETag', b'').decode('utf-8', errors='ignore') or None
-
-        # Create a Scrapy Item
+        # Create the item with all required fields
         item = WebpageItem(
             url=response.url,
-            title=title,
-            meta_description=meta_description,
-            meta_language=meta_language,
-            og_title=og_title,
-            og_description=og_description,
-            canonical_url=canonical_url,
-            last_modified=last_modified,
-            etag=etag,
-            content_type=content_type,
-            raw_html=response.text,  # Store the complete HTML
-            content_length=len(response.body),
-            response_headers=str(response.headers),
+            title=response.css('title::text').get() or '',
+            description=response.css('meta[name="description"]::attr(content), meta[property="og:description"]::attr(content)').get() or '',
+            lang=lang,
+            last_modified=response.headers.get('Last-Modified', b'').decode('utf-8', errors='ignore') or None,
+            etag=response.headers.get('ETag', b'').decode('utf-8', errors='ignore') or None,
+            raw_html=response.text,
+            headers=str(response.headers),
             status_code=response.status,
             crawled_at=datetime.now(),
-            depth=response.meta.get('depth', 0)
         )
         
-        # Yield the item to be processed by the pipeline
-        yield item
+        return item
+    
+    def _extract_language(self, response):
+        """
+        Extract language from HTML using multiple methods in order of reliability.
+        
+        Args:
+            response: Scrapy response object
+            
+        Returns:
+            str: Detected language code or empty string if not found
+        """
+        # Method 1: Check html lang attribute (most common)
+        lang = response.css('html::attr(lang)').get()
+        if lang:
+            return lang.strip()
+            
+        # Method 2: Check Content-Language meta tag
+        lang = response.css('meta[http-equiv="Content-Language"]::attr(content)').get()
+        if lang:
+            return lang.strip()
+            
+        # Method 3: Check hreflang link elements
+        # Often the default language will have x-default or no locale
+        lang = response.css('link[rel="alternate"][hreflang="x-default"]::attr(hreflang)').get()
+        if lang:
+            return lang.strip()
+            
+        # Method 4: Try to extract from URL structure if it follows a pattern like /en/
+        url_parts = response.url.split('/')
+        for part in url_parts:
+            if len(part) == 2:  # Most language codes are 2 characters
+                return part
+                
 
+        # Default to empty string if no language detected
+        return ''
