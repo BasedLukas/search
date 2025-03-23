@@ -1,9 +1,12 @@
-from src;
-scrapy crawl spidername
+# ensure mongo is running:
+docker run --name mongodb -d \
+  -p 27017:27017 \
+  -v /data/mongodb:/data/db \
+  --restart always \
+  mongo
+docker ps | grep mongo
 
-pipelines.py has the update mongo db code
-
-rsync to server:
+# rsync code to server:
 rsync -avz --progress \
 --exclude=".venv/" \
 --exclude=".git/" \
@@ -22,3 +25,7 @@ source ~/.zshrc
 uv venv .venv
 source .venv/bin/activate
 uv sync
+
+# run from scrape_delv/src;
+scrapy crawl spidername
+

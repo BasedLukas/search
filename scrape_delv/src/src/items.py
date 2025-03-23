@@ -30,4 +30,4 @@ class RepoFileItem(scrapy.Item):
     repo_name = scrapy.Field()
     file_extension = scrapy.Field()
     file_path = scrapy.Field()
-    url = scrapy.Field()  # Will be the same as file_url, for compatibility with existing pipeline
+    url = scrapy.Field()  

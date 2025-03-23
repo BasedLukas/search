@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 class ToscrapeSpider(CrawlSpider):
-    name = "snowflake"
+    name = "snowflake_docs"
     allowed_domains = ["docs.snowflake.com"]
     start_urls = [
         "https://docs.snowflake.com/en/developer",
@@ -29,7 +29,7 @@ class ToscrapeSpider(CrawlSpider):
         'LOG_LEVEL': 'INFO',
         'LOG_ENABLED': True,
         'LOG_FILE': 'snowflake.log',
-        'CLOSESPIDER_PAGECOUNT': 10,  # Limit page numbers
+        # 'CLOSESPIDER_PAGECOUNT': 10,  # Limit page numbers
         'ROBOTSTXT_OBEY': True,
     }
     

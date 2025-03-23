@@ -9,8 +9,12 @@ from pymongo import MongoClient
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 
+MONGODB_DATABASE = 'test_db'
+# MONGODB_COLLECTION = 'github'
+MONGODB_COLLECTION = 'docs'
+
 class MongoDBPipeline:
-    collection_name = 'snowflake_test'
+    collection_name = MONGODB_COLLECTION
 
     def __init__(self, mongo_uri, mongo_db):
         self.mongo_uri = mongo_uri
@@ -20,7 +24,7 @@ class MongoDBPipeline:
     def from_crawler(cls, crawler):
         return cls(
             mongo_uri='mongodb://localhost:27017/',
-            mongo_db='test_db'
+            mongo_db=MONGODB_DATABASE
         )
 
     def open_spider(self, spider):
@@ -47,7 +51,7 @@ class MongoDBPipeline:
 
 
 class MongoDBRepoFilePipeline:
-    collection_name = 'github_repo_files'
+    collection_name = MONGODB_COLLECTION
 
     def __init__(self, mongo_uri, mongo_db):
         self.mongo_uri = mongo_uri
@@ -57,7 +61,7 @@ class MongoDBRepoFilePipeline:
     def from_crawler(cls, crawler):
         return cls(
             mongo_uri='mongodb://localhost:27017/',
-            mongo_db='test_db'
+            mongo_db=MONGODB_DATABASE
         )
 
     def open_spider(self, spider):
