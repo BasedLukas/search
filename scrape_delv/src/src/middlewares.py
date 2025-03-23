@@ -7,6 +7,32 @@ from scrapy import signals
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
+from scrapy.exceptions import IgnoreRequest
+
+class LanguageMiddleware:
+    """Middleware to handle language-based decisions"""
+    
+    @classmethod
+    def from_crawler(cls, crawler):
+        s = cls()
+        crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        return s
+        
+    def process_spider_output(self, response, result, spider):
+        """Process the output from a spider callback"""
+        # If response is marked as non-English, we drop requests to follow links
+        if response.meta.get('dont_follow', False):
+            for x in result:
+                # Only yield items, not requests
+                if not hasattr(x, 'url'):  # It's not a Request object
+                    yield x
+        else:
+            # Regular processing for English pages
+            for x in result:
+                yield x
+                
+    def spider_opened(self, spider):
+        spider.logger.info('Spider opened: %s' % spider.name)
 
 
 class SnowflakeSpiderMiddleware:

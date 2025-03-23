@@ -1,5 +1,6 @@
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
+from scrapy.exceptions import IgnoreRequest
 import logging
 from datetime import datetime
 
@@ -14,44 +15,49 @@ class ToscrapeSpider(CrawlSpider):
         "https://docs.snowflake.com/en/tutorials",
         "https://docs.snowflake.com/en/"
     ]
-
+    
     rules = (
         Rule(LinkExtractor(allow_domains=allowed_domains), callback='parse_item', follow=True),
     )
     
-    # Configure Spider logging and crawl behavior
     custom_settings = {
         'LOG_LEVEL': 'DEBUG',
         'LOG_ENABLED': True,
         'LOG_FILE': 'snowflake.log',
-        'CLOSESPIDER_PAGECOUNT': 100,  # Limit page numbers
+        # 'CLOSESPIDER_PAGECOUNT': 100,
         'ROBOTSTXT_OBEY': True,
-    'ITEM_PIPELINES': {
-        'src.pipelines.MongoDBPipeline': 300,
-    }
+        'ITEM_PIPELINES': {
+            'src.pipelines.MongoDBPipeline': 300,
+        },
+        # Add middleware to handle language detection
+        'SPIDER_MIDDLEWARES': {
+            'src.middlewares.LanguageMiddleware': 543,
+        }
     }
     
     def parse_item(self, response):
         """
         Parse HTML response and extract document metadata.
-        
-        Args:
-            response: Scrapy response object
-            
-        Returns:
-            WebpageItem: Item containing extracted metadata
         """
         from src.items import WebpageItem
 
         # Skip non-HTML content
         content_type = response.headers.get('Content-Type', b'').decode('utf-8', errors='ignore')
         if 'text/html' not in content_type:
-            return
+            return None
 
-        # Extract language carefully from various potential sources
+        # Check language
         lang = self._extract_language(response)
         
-        # Create the item with all required fields
+        # If not English, mark response for not following links
+        if lang not in ['en', '']:
+            self.logger.info(f"Skipping non-English page with language '{lang}': {response.url}")
+            # Set a flag that our middleware will check
+            response.meta['dont_follow'] = True
+            # Don't return an item
+            return None
+            
+        # If English, process the page
         item = WebpageItem(
             url=response.url,
             title=response.css('title::text').get() or '',
@@ -64,9 +70,9 @@ class ToscrapeSpider(CrawlSpider):
             status_code=response.status,
             crawled_at=datetime.now(),
         )
-        
         return item
-    
+
+
     def _extract_language(self, response):
         """
         Extract language from HTML using multiple methods in order of reliability.
@@ -99,6 +105,5 @@ class ToscrapeSpider(CrawlSpider):
             if len(part) == 2:  # Most language codes are 2 characters
                 return part
                 
-
         # Default to empty string if no language detected
         return ''

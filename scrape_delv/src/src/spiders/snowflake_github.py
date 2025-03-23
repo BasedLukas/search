@@ -33,9 +33,9 @@ class GithubRepoSpider(scrapy.Spider):
         'ROBOTSTXT_OBEY': False,  # Not needed for GitHub repos
         'DOWNLOAD_TIMEOUT': 180,  # Increase timeout for large repos
         'DOWNLOAD_DELAY': 0.5,    # Small delay to be nice to GitHub API
-    'ITEM_PIPELINES': {
-        'src.pipelines.MongoDBRepoFilePipeline': 300,
-    }
+        'ITEM_PIPELINES': {
+            'src.pipelines.MongoDBRepoFilePipeline': 300,
+        }
     }
     
     def __init__(self, organization=GITHUB_ORGANIZATION, *args, **kwargs):
