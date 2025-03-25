@@ -10,22 +10,19 @@ docker ps | grep mongo
 rsync -avz --progress \
 --exclude=".venv/" \
 --exclude=".git/" \
+--exclude=".scrapy/" \
+--exclude="*.log" \
 --exclude="__pycache__/" \
 . mongo:/path/to/project
 
 # SSH into your mongo server
 ssh mongo
 cd /path/to/project
-
-# Install uv on the remote server
 curl -LsSf https://astral.sh/uv/install.sh | sh
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
-
-source ~/.zshrc
-uv venv .venv
+uv venv
 source .venv/bin/activate
 uv sync
-
-# run from scrape_delv/src;
+cd src  
+# run spider:
 scrapy crawl spidername
 
