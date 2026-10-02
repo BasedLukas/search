@@ -1,0 +1,16 @@
+[project]
+name = "search-delv"
+version = "0.1.0"
+description = "GetDelv document search with MongoDB and Meilisearch"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    "pydantic>=2.6.0",
+    "meilisearch>=0.34.0",
+    "pymongo>=4.11.2",
+    "python-dotenv>=1.0.1",
+    "beautifulsoup4>=4.13.3",
+    "requests>=2.32",
+]

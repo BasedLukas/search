@@ -3,14 +3,14 @@ Description=Gunicorn instance to serve your Flask app
 After=network.target
 
 [Service]
-User=ubuntu
-Group=ubuntu
+User=getdelv
+Group=getdelv
 
-WorkingDirectory=/path/to/project
-Environment="PATH=/path/to/project"
-Restart=always  # Ensure the service restarts if it crashes
-RestartSec=5    # Delay before restarting the service
-ExecStart=/path/to/project --workers 1 --bind 127.0.0.1:5000 --log-level=info --capture-output application:app
+WorkingDirectory=/opt/getdelv
+Environment="PATH=/opt/getdelv/.venv/bin:/usr/bin:/bin"
+Restart=always
+RestartSec=5
+ExecStart=/opt/getdelv/.venv/bin/gunicorn --workers 1 --bind 127.0.0.1:5000 --log-level=info --capture-output application:app
 
 [Install]
 WantedBy=multi-user.target

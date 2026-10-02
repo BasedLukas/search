@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
   <title>Search Results - getdelv demo</title>
   <style>
     body {
@@ -13,9 +14,9 @@
       padding: 0;
     }
     .container {
-      max-width: 1000px;
+      max-width: 800px;  /* Reduced from 1000px for better readability */
       margin: 0 auto;
-      padding: 60px 20px 20px 20px; /* Added more top padding */
+      padding: 60px 40px; /* Increased horizontal padding */
     }
     .search-container {
       margin: 30px 0;
@@ -54,30 +55,39 @@
       <button type="submit" class="btn">Search</button>
     </form>
     
-<!-- Results will be displayed here -->
-<div class="results">
-  {% if my_results %}
-    {% for result in my_results %}
-      <div class="result-item">
-        <h3>{{ result.title }}</h3>
-        <div class="result-content">
-          {{ result.html|safe }}
+    <!-- Results will be displayed here -->
+    <div class="results-container">
+      {% if my_results %}
+        <div class="results-grid" style="display: block;">  <!-- Changed to block display -->
+          {% for result in my_results %}
+            <div class="result-item" onclick="toggleExpand(this)" style="margin-bottom: 20px;">  <!-- Added margin -->
+              <h3>{{ result.title }}</h3>
+              <div class="result-html">
+                {{ result.html|safe }}
+              </div>
+              {% if result.source %}
+                <p class="result-source">Source: {{ result.source }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
         </div>
-        {% if result.source %}
-          <p class="result-source">Source: {{ result.source }}</p>
-        {% endif %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>No results found for "{{ query }}"</p>
-  {% endif %}
-
-</div>
+      {% else %}
+        <p>No results found for "{{ query }}"</p>
+      {% endif %}
+    </div>
+    
     
     <!-- Back button -->
     <div class="back-button">
       <a href="/" class="btn">Back to Search</a>
     </div>
   </div>
+
+  <script>
+    function toggleExpand(element) {
+      const htmlContent = element.querySelector('.result-html');
+      htmlContent.classList.toggle('expanded');
+    }
+  </script>
 </body>
 </html>

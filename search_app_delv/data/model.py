@@ -131,7 +131,9 @@ if __name__ == "__main__":
     load_environment()
     
     # Set your input directory and output file path accordingly.
-    INPUT_DIR = "/path/to/project"
-    OUTPUT_FILE = "/path/to/project"
+    INPUT_DIR = os.getenv("DELV_HTML_DIR")
+    OUTPUT_FILE = os.getenv("DELV_EMBEDDINGS_FILE", "out.json")
+    if not INPUT_DIR:
+        raise ValueError("Set DELV_HTML_DIR to an HTML corpus directory.")
     
     process_directory(INPUT_DIR, OUTPUT_FILE)

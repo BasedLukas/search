@@ -56,42 +56,87 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+}
+
+/* Results Grid */
+.results-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    padding: 20px 0;
+}
+
+/* Result Item */
+.result-item {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.result-item h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+/* Result HTML Content */
+.result-html {
+    overflow: hidden;
+    max-height: 100px;
+    transition: max-height 0.3s ease-out;
+    position: relative;
+}
+
+.result-html::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(transparent, #ffffff);
+    pointer-events: none;
+}
+
+.result-html.expanded {
+    max-height: none;
+}
+
+.result-html.expanded::after {
+    display: none;
+}
+
+/* Source Text */
+.result-source {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-item {
+        margin: 10px 0;
+    }
 }
 
 /* Page Heading */
 h1 {
     font-size: 24px;
     margin-bottom: 20px;
-}
-
-/* Responsive Results Grid */
-@media (min-width: 601px) {
-    .results-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-}
-
-@media (max-width: 600px) {
-    .results-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-}
-
-/* Result Item with clear border */
-.result-item {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Disable links inside result items */
@@ -111,20 +156,6 @@ h1 {
 .result-distance {
     font-size: 14px;
     color: #555;
-}
-
-/* Truncated HTML content with expand/collapse */
-.result-html {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: var(--default-lines, 3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.result-html.expanded {
-    -webkit-line-clamp: unset;
 }
 
 /* Additional mobile spacing for result items */

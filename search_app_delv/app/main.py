@@ -21,7 +21,7 @@ def results_page() -> Any:
     my_results = search_results["results"]
     stats = search_results["stats"]
     # Allow a query parameter "lines" to set how many lines to show by default (default is 3).
-    default_lines = int(request.args.get('lines', 3))
+    default_lines = request.args.get('lines', 3, type=int)
     return render_template(
         'results.html',
         query=query,
@@ -32,19 +32,16 @@ def results_page() -> Any:
 
 @app.route("/api", methods=["POST"])
 def api_endpoint():
-    data = request.get_json()
-    query = data.get("query")
-    if not query:
+    data = request.get_json(silent=True)
+    query = data.get("query") if isinstance(data, dict) else None
+    if not isinstance(query, str) or not query.strip():
         log.info("Error, no query provided")
         return jsonify({"error": "No query provided"}), 400
 
-    results = search(query)
-    log.info(f"search result (truncated):{results.text[:50]}")
-    return jsonify({
-        "result0": results["results"][0].html,
-        "result1": results["results"][1].html,
-        "result2": results["results"][2].html,
-    })
+    results = search(query)["results"]
+    if results:
+        log.info(f"search result (truncated):{results[0].text[:50]}")
+    return jsonify({f"result{i}": result.html for i, result in enumerate(results[:3])})
 
 if __name__ == '__main__':
     app.run(debug=True)

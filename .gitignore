@@ -1,0 +1,43 @@
+# Private configuration
+.env
+.env.*
+!.env.example
+
+# Local runtime and generated files
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+node_modules/
+dist/
+*.log
+.pytest_cache/
+data.ms/
+.terraform/
+*.tfstate*
+.scrapy/
+crawled_pages/
+*.jsonl
+*.csv
+*.parquet
+*.pkl
+*.npy
+*.npz
+*.faiss
+*.bin
+
+# Capture and pipeline outputs
+*.xml
+brave_result.json
+t.json
+selectors.json
+processing_metadata
+cleaned_*.html
+soup.html
+/mcp_delv/text.txt
+/search_app_delv/out.json
+/search_app_delv/data/out.json
+/search_app_delv/backend/url_mapping.json
+
+# Local instructions
+/AGENTS.md

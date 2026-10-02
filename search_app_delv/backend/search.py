@@ -25,13 +25,13 @@ env = dotenv.dotenv_values()
 USE_LOCAL = True  # Set to True to use local files (with download if needed)
 
 # S3 configuration
-S3_BUCKET = "example-resource"
+S3_BUCKET = os.getenv("DELV_S3_BUCKET", env.get("DELV_S3_BUCKET", ""))
 HTML_BASE_PREFIX = "docs/"  # Folder inside the bucket where HTML files are stored
 
 # Local file paths
 LOCAL_INDEX_FILE = "backend/index.bin"
 LOCAL_URL_MAPPING_FILE = "backend/url_mapping.json"
-HTML_BASE_PATH = "/path/to/project"
+HTML_BASE_PATH = os.getenv("DELV_HTML_BASE_PATH", env.get("DELV_HTML_BASE_PATH", ""))
 
 # S3 paths
 S3_INDEX_FILE = f"s3://{S3_BUCKET}/index.bin"
@@ -55,6 +55,7 @@ class Result:
     text: str
     html: str
     distance: float
+    source: str = ""
 
 @dataclass
 class Stats:
@@ -156,28 +157,34 @@ def fetch_results(distances, indices, url_mapping):
         if idx < 0:
             continue
         
-        file_path = url_mapping.get(str(idx), "Unknown URL")
+        file_path = url_mapping.get(str(idx))
+        if not file_path:
+            continue
         # HTML content always from S3 regardless of USE_LOCAL setting
         s3_file_path = file_path.replace(HTML_BASE_PATH, "")
         s3_file_path = f"s3://{S3_BUCKET}/{HTML_BASE_PREFIX}{s3_file_path}"
-        fulltext = get_html_text(s3_file_path)
-
         try:
             s3 = boto3.client("s3")
             bucket, key = s3_file_path[5:].split("/", 1)
             obj = s3.get_object(Bucket=bucket, Key=key)
             html_content = obj["Body"].read().decode("utf-8")
         except Exception as e:
-            log.warning(f"Failed to extract title from {s3_file_path}: {e}")
-            html_content = ""
+            log.warning(f"Failed to retrieve {s3_file_path}: {e}")
+            continue
+
+        soup = BeautifulSoup(html_content, "html.parser")
+        heading = soup.find("title") or soup.find("h1")
+        title = heading.get_text(" ", strip=True) if heading else file_path
+        fulltext = soup.get_text(separator=" ", strip=True)
 
         results.append(Result(
-            title="",
+            title=title,
             url=s3_file_path,
             snippet=fulltext,
             text=fulltext[:250],
             html=html_content,
-            distance=float(distances[0][i])
+            distance=float(distances[0][i]),
+            source=s3_file_path
         ))
     return results
 
@@ -189,6 +196,8 @@ def create_search_engine() -> Tuple[callable, Stats]:
     - URL mapping
     - SentenceTransformer model
     """
+    if not S3_BUCKET:
+        raise RuntimeError("Set DELV_S3_BUCKET to the bucket containing the index, URL mapping and HTML documents.")
     log.info("Loading faiss index...")
     faiss.omp_set_num_threads(1)
     index = load_faiss_index(S3_INDEX_FILE)

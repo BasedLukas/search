@@ -1,7 +1,7 @@
 #!/bin/bash
 # Upload index files to s3
 DEPLOY_DIR="$(dirname "$0")/.."
-S3_BUCKET="example-resource"
+S3_BUCKET="s3://${DELV_S3_BUCKET:?Set DELV_S3_BUCKET}"
 
 # Sync index.bin and url_mapping.json to S3
 aws s3 cp "$DEPLOY_DIR/backend/index.bin" "$S3_BUCKET/index.bin" --acl bucket-owner-full-control

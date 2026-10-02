@@ -1,26 +1,24 @@
-## DEVELOPMENT 
+# Semantic search
 
+Flask search interface using BGE embeddings, FAISS retrieval and HTML documents stored in S3.
 
-### Docker Development (Recommended for Mac)
-```bash
-# Build the Docker image
-docker build -t search_app .
+- `app/`: search pages and `POST /api`.
+- `backend/`: query encoding, vector lookup and document retrieval.
+- [data/](data/readme.md): HTML embedding and index generation, plus Common Crawl downloads.
+- `use/main.py`: OpenAI tool-calling client for the local API.
+- `deploy/`: S3 upload, rsync, systemd and nginx configuration.
 
-# Option 1: Run with mounted AWS credentials (recommended)
-docker run -p 5001:5000 \
-  -v ~/.aws:/root/.aws:ro \
-  search_app
+Running search requires a FAISS index, its document-path mapping, the corresponding HTML corpus and AWS access. These assets are supplied separately. Set `DELV_S3_BUCKET`; set `DELV_HTML_BASE_PATH` to the path prefix to remove from mapped document paths when forming S3 keys. The bucket holds `index.bin`, `url_mapping.json` and HTML objects under `docs/`.
 
+From this directory, with storage configured:
 
-You can then access the application at http://localhost:5001 in your web browser.
+```sh
+uv sync
+uv run python application.py
+```
 
-Note: Make sure you have valid AWS credentials in `~/.aws/credentials` if using Option 1, or set the correct environment variables if using Option 2.
+The app serves port 5000. Startup loads the index and `BAAI/bge-base-en-v1.5` model. Index and mapping files are cached in `backend/`; result HTML is fetched from S3. `POST /api` accepts `{"query": "search terms"}` and returns up to three HTML fields named `result0`, `result1` and `result2`.
 
-## TO DEPLOY
-* comment out dev in .env
-run:
-`upload.sh` to upload index files to s3
-`deploy.sh` to deploy to ec2
+Document encoding uses `normalize_embeddings=False`, while query encoding uses `True`. Align both settings before rebuilding an index.
 
-##### key update for new ec2 instance
-ssh-keygen -f "/path/to/project" -R "127.0.0.1"
+The optional OpenAI client requires the OpenAI SDK, `OPENAI_API_KEY` and access to its configured model. Deployment requires `DELV_REMOTE_USER`, `DELV_REMOTE_HOST` and `DELV_REMOTE_DIR`; adapt the service user, paths and nginx host to the target machine.
